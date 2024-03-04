@@ -3,7 +3,7 @@ package main
 import (
 	"auth/internal/app"
 	"auth/internal/config"
-	slogpretty "auth/internal/lib/logger/handlers"
+	slogpretty "auth/internal/utils/logger/handlers"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -22,7 +22,8 @@ func main() {
 
 	log.Info("config", slog.Any("config", cfg))
 
-	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
+	application := app.New(log, cfg)
+
 	go application.GRPCSrv.MustRun()
 
 	stop := make(chan os.Signal, 1)
@@ -49,6 +50,7 @@ func setupLogger(env string) *slog.Logger {
 	}
 	return log
 }
+
 func setupPrettySlog() *slog.Logger {
 	opts := slogpretty.PrettyHandlerOptions{
 		SlogOpts: &slog.HandlerOptions{
