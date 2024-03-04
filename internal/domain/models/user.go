@@ -1,7 +1,7 @@
 package models
 
 type User struct {
-	ID       int64
-	Email    string
-	PassHash []byte
+	ID       int64  `db:"id"`
+	Email    string `db:"email"`
+	PassHash []byte `db:"password_hash"`
 }

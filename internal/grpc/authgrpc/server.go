@@ -12,7 +12,7 @@ const emptyValue = 0
 
 type Auth interface {
 	Login(ctx context.Context, email string, password string, app_id int) (token string, err error)
-	RegisterNewUser(ctx context.Context, email string, password string) (user_id int64, err error)
+	RegisterNewUser(ctx context.Context, email string, password string) (err error)
 	IsAdmin(ctx context.Context, user_id int64) (bool, error)
 }
 
@@ -37,9 +37,11 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 	}
 
 	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
+
 	return &ssov1.LoginResponce{
 		Token: token,
 	}, nil
@@ -49,13 +51,16 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 	if err := valideteRegiser(req); err != nil {
 		return nil, err
 	}
-	user_id, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
+
+	err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
+
 	if err != nil {
-		//
+		// todo
 		return nil, status.Error(codes.Internal, "internal error")
 	}
+
 	return &ssov1.RegisterResponse{
-		UserId: user_id,
+		UserId: -1,
 	}, nil
 }
 
@@ -65,13 +70,13 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 	}
 
 	isAdmin, err := s.auth.IsAdmin(ctx, req.GetUserId())
+
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 	return &ssov1.IsAdminResponce{
 		IsAdmin: isAdmin,
 	}, nil
-
 }
 
 func valideteRegiser(req *ssov1.RegisterRequest) error {
@@ -83,6 +88,7 @@ func valideteRegiser(req *ssov1.RegisterRequest) error {
 	}
 	return nil
 }
+
 func valideteIsAdmin(req *ssov1.IsAdminRequest) error {
 	if req.GetUserId() == emptyValue {
 		return status.Error(codes.InvalidArgument, "user_id is required")

@@ -23,11 +23,13 @@ func New(log *slog.Logger, port int, authService authgrpc.Auth) *App {
 		port:       port,
 	}
 }
+
 func (a *App) MustRun() {
 	if err := a.Run(); err != nil {
 		panic(err)
 	}
 }
+
 func (a *App) Run() error {
 	const op = "grpcapp.Run"
 	log := a.log.With(

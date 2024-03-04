@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/auth.iml" filepath="$PROJECT_DIR$/.idea/auth.iml" />
       <module fileurl="file://$USER_HOME$/protos/.idea/protos.iml" filepath="$USER_HOME$/protos/.idea/protos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sso.iml" filepath="$PROJECT_DIR$/.idea/sso.iml" />
     </modules>
   </component>
 </project>

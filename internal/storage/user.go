@@ -1,33 +1,31 @@
 package storage
 
 import (
+	"auth/internal/domain/models"
 	"auth/internal/storage/provider"
+	"fmt"
 	"log/slog"
 )
 
 const TableName = "auth_data"
 
-type AuthStorage interface {
-	//RegUser(username, email, password, role string) error
-	//ChangeRoleByUsername(username, role string) error
-	//FindByUsername(username string) (*db.UserCredential, error)
-
+type UserStorage interface {
+	GetUser(email string) (*models.User, error)
 	SaveUser(email string, passhash []byte) error
 }
 
-type InAuthMysqlStorage struct {
+type InUserMysqlStorage struct {
 	mysqlProvider *provider.MySQLProvider
-
-	log *slog.Logger
+	log           *slog.Logger
 }
 
-func NewInAuthMysqlRepository(log *slog.Logger, address, username, password, database string, port uint16) AuthStorage {
+func NewInAuthMysqlStorage(log *slog.Logger, address, username, password, database string, port uint16) UserStorage {
 	mySQLProvider, err := provider.NewMySQLProvider(address, port, username, password, database)
 	if err != nil {
 		panic(err)
 	}
 
-	result := &InAuthMysqlStorage{
+	result := &InUserMysqlStorage{
 		mysqlProvider: mySQLProvider,
 		log:           log,
 	}
@@ -36,7 +34,7 @@ func NewInAuthMysqlRepository(log *slog.Logger, address, username, password, dat
 	return result
 }
 
-func (s *InAuthMysqlStorage) initTables() {
+func (s *InUserMysqlStorage) initTables() {
 	db := s.mysqlProvider.DB
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableName + " (" +
 		"id BIGINT NOT NULL AUTO_INCREMENT, " +
@@ -47,10 +45,38 @@ func (s *InAuthMysqlStorage) initTables() {
 		"PRIMARY KEY (id)" +
 		")")
 	if err != nil {
-		//utils.GetLogger().Fatal(err)
+		s.log.Error("Error: ", err)
 	}
 }
 
-func (s *InAuthMysqlStorage) SaveUser(email string, passhash []byte) error {
-	panic("Not implements!")
+func (s *InUserMysqlStorage) GetUser(email string) (*models.User, error) {
+	driver, err := s.mysqlProvider.Driver()
+	if err != nil {
+		s.log.Error("Error get data from database", err)
+		return nil, err
+	}
+	sub := &models.User{}
+
+	rows, err := driver.NamedQuery(fmt.Sprintf("SELECT * FROM "+TableName+" WHERE email = '%s'", email), sub)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, fmt.Errorf("rows not found")
+	}
+	err = rows.StructScan(&sub)
+	return sub, err
+}
+
+func (s *InUserMysqlStorage) SaveUser(email string, passhash []byte) error {
+	driver, err := s.mysqlProvider.Driver()
+	if err != nil {
+		s.log.Error("Error insert to database", err)
+	}
+	driver.NamedExec("INSERT INTO "+TableName+" (`email`, `password_hash`) VALUES (:email, :password_hash)", map[string]interface{}{
+		"email":         email,
+		"password_hash": passhash,
+	})
+	return err
 }
