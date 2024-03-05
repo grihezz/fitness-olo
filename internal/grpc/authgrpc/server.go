@@ -12,7 +12,7 @@ const emptyValue = 0
 
 type Auth interface {
 	Login(ctx context.Context, email string, password string, app_id int) (token string, err error)
-	RegisterNewUser(ctx context.Context, email string, password string) (err error)
+	RegisterNewUser(ctx context.Context, email string, password string) (int64, error)
 	IsAdmin(ctx context.Context, user_id int64) (bool, error)
 }
 
@@ -52,7 +52,7 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 		return nil, err
 	}
 
-	err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
+	user_id, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
 
 	if err != nil {
 		// todo
@@ -60,7 +60,7 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 	}
 
 	return &ssov1.RegisterResponse{
-		UserId: -1,
+		UserId: user_id,
 	}, nil
 }
 

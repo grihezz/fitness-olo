@@ -26,20 +26,16 @@ func (s *InMysqlStorage) initTableApps() {
 }
 
 func (s *InMysqlStorage) initTestDataForApps() {
-	err := s.addAppWithIndex(&models.App{
+	s.addAppWithIndex(&models.App{
 		ID:     1,
 		Name:   "Auth",
 		Secret: "test-test",
 	})
-	if err != nil {
-		s.log.Error("Error insert to database", err)
-	}
 }
 
 func (s *InMysqlStorage) addAppWithIndex(app *models.App) error {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
-		s.log.Error("Error insert to database", err)
 		return err
 	}
 	_, err = driver.NamedExec("INSERT INTO "+TableNameApp+" (`id`, `name`, `secret`) VALUES (:id, :name, :secret)", app)

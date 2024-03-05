@@ -6,8 +6,9 @@ import (
 )
 
 type UserStorage interface {
-	GetUser(email string) (*models.User, error)
-	SaveUser(email string, passhash []byte) error
+	GetUserByEmail(email string) (*models.User, error)
+	GetUserById(id int64) (*models.User, error)
+	SaveUser(email string, passhash []byte) (int64, error)
 }
 
 // region for mysql Provider
@@ -28,7 +29,7 @@ func (s *InMysqlStorage) initTableUser() {
 	}
 }
 
-func (s *InMysqlStorage) GetUser(email string) (*models.User, error) {
+func (s *InMysqlStorage) GetUserByEmail(email string) (*models.User, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
 		s.log.Error("Error get data from database", err)
@@ -48,16 +49,41 @@ func (s *InMysqlStorage) GetUser(email string) (*models.User, error) {
 	return sub, err
 }
 
-func (s *InMysqlStorage) SaveUser(email string, passhash []byte) error {
+func (s *InMysqlStorage) GetUserById(id int64) (*models.User, error) {
+	driver, err := s.mysqlProvider.Driver()
+	if err != nil {
+		s.log.Error("Error get data from database", err)
+		return nil, err
+	}
+
+	sub := &models.User{}
+	rows, err := driver.NamedQuery(fmt.Sprintf("SELECT * FROM "+TableNameUser+" WHERE id = '%d'", id), sub)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, fmt.Errorf("rows not found")
+	}
+	err = rows.StructScan(&sub)
+	return sub, err
+}
+
+func (s *InMysqlStorage) SaveUser(email string, passhash []byte) (int64, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
 		s.log.Error("Error insert to database", err)
 	}
-	driver.NamedExec("INSERT INTO "+TableNameUser+" (`email`, `password_hash`) VALUES (:email, :password_hash)", map[string]interface{}{
+	res, err := driver.NamedExec("INSERT INTO "+TableNameUser+" (`email`, `password_hash`) VALUES (:email, :password_hash)", map[string]interface{}{
 		"email":         email,
 		"password_hash": passhash,
 	})
-	return err
+	if err != nil {
+		s.log.Error("Error save user", err)
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	return id, err
 }
 
 // endregion
