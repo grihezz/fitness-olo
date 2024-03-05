@@ -36,14 +36,14 @@ func (a *App) Run() error {
 		slog.String("op", op),
 		slog.Int("port", a.port))
 
-	log.Info("starting grpcSerer")
+	log.Info("starting grpcServer")
 
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	log.Info("grpcSerer is running", slog.String("addr", l.Addr().String()))
+	log.Info("grpcServer is running", slog.String("addr", l.Addr().String()))
 
 	if err := a.gRPCServer.Serve(l); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
