@@ -14,18 +14,18 @@ type UserStorage interface {
 	SaveUser(email string, passhash []byte) error
 }
 
-type InUserMysqlStorage struct {
+type InMysqlStorage struct {
 	mysqlProvider *provider.MySQLProvider
 	log           *slog.Logger
 }
 
-func NewInAuthMysqlStorage(log *slog.Logger, address, username, password, database string, port uint16) UserStorage {
+func NewInAuthMysqlStorage(log *slog.Logger, address, username, password, database string, port uint16) *InMysqlStorage {
 	mySQLProvider, err := provider.NewMySQLProvider(address, port, username, password, database)
 	if err != nil {
 		panic(err)
 	}
 
-	result := &InUserMysqlStorage{
+	result := &InMysqlStorage{
 		mysqlProvider: mySQLProvider,
 		log:           log,
 	}
@@ -34,8 +34,9 @@ func NewInAuthMysqlStorage(log *slog.Logger, address, username, password, databa
 	return result
 }
 
-func (s *InUserMysqlStorage) initTables() {
+func (s *InMysqlStorage) initTables() {
 	db := s.mysqlProvider.DB
+	// Создание таблицы auth_data, если она еще не существует
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableName + " (" +
 		"id BIGINT NOT NULL AUTO_INCREMENT, " +
 		"email VARCHAR(255) NOT NULL UNIQUE, " +
@@ -45,18 +46,27 @@ func (s *InUserMysqlStorage) initTables() {
 		"PRIMARY KEY (id)" +
 		")")
 	if err != nil {
-		s.log.Error("Error: ", err)
+		s.log.Error("Error creating auth_data table: ", err)
+	}
+
+}
+
+func (s *InMysqlStorage) initRegsTestData() {
+	db := s.mysqlProvider.DB
+	_, err := db.Exec("INSERT INTO app (app_id, name, secret) VALUES (1, 'test', 'test-test')")
+	if err != nil {
+		s.log.Error("Error insert to database", err)
 	}
 }
 
-func (s *InUserMysqlStorage) GetUser(email string) (*models.User, error) {
+func (s *InMysqlStorage) GetUser(email string) (*models.User, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
 		s.log.Error("Error get data from database", err)
 		return nil, err
 	}
-	sub := &models.User{}
 
+	sub := &models.User{}
 	rows, err := driver.NamedQuery(fmt.Sprintf("SELECT * FROM "+TableName+" WHERE email = '%s'", email), sub)
 	if err != nil {
 		return nil, err
@@ -69,7 +79,7 @@ func (s *InUserMysqlStorage) GetUser(email string) (*models.User, error) {
 	return sub, err
 }
 
-func (s *InUserMysqlStorage) SaveUser(email string, passhash []byte) error {
+func (s *InMysqlStorage) SaveUser(email string, passhash []byte) error {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
 		s.log.Error("Error insert to database", err)
