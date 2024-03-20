@@ -4,7 +4,7 @@ services:
   db:
     image: mysql:latest
     volumes:
-      - /home/testerdev/db-sso/db_data:/var/lib/mysql
+      - /Users/testerdev/Documents/db_images/db-sso/db_data:/var/lib/mysql
     restart: always
     environment:
       MYSQL_DATABASE: sso
@@ -16,7 +16,7 @@ services:
       timeout: 20s
       retries: 10
 
-  goapp:
+  go-app:
     build:
       context: .
       dockerfile: Dockerfile

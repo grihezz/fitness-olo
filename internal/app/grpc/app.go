@@ -1,7 +1,7 @@
 package grpcapp
 
 import (
-	authgrpc "auth/internal/grpc/authgrpc"
+	"auth/internal/grpc/authgrpc"
 	"fmt"
 	"google.golang.org/grpc"
 	"log/slog"
@@ -57,5 +57,4 @@ func (a *App) Stop() {
 	a.log.With(slog.String("op", op)).Info("stopping GRPC server", slog.Int("port", a.port))
 
 	a.gRPCServer.GracefulStop()
-
 }

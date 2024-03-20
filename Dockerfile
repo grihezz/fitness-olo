@@ -19,12 +19,11 @@ FROM alpine:latest
 # Set the working directory in the final image
 WORKDIR /app
 
-ENV CONFIG_PATH config/local.yaml
+ENV CONFIG_PATH static/local.yaml
 
 # Copy the binary from the builder stage to the final image
 COPY --from=builder /app/main .
 COPY --from=builder /app/static static
-COPY --from=builder /app/config config
 
 # Run the Go application
 CMD ["./main"]
