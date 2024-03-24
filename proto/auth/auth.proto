@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package proto;
+
+import "google/api/annotations.proto";
+
+option go_package = "/auth_service/generated";
+
+service Auth {
+  rpc Register (RegisterRequest) returns (RegisterResponse){
+    option (google.api.http).post = "/sso/v2/auth/register";
+    option (google.api.http).body = "*";
+  }
+  rpc Login (LoginRequest) returns (LoginResponce){
+    option (google.api.http).post = "/sso/v2/auth/login";
+    option (google.api.http).body = "*";
+  }
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponce){
+    option (google.api.http).post = "/sso/v2/auth/is_admin";
+    option (google.api.http).body = "*";
+  }
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  int64 user_id = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+  int32 app_id = 3;
+}
+
+message LoginResponce{
+  string token = 1;
+}
+
+message IsAdminRequest {
+  int64 user_id = 1;
+}
+
+message IsAdminResponce {
+  bool is_admin = 1;
+}

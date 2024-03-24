@@ -1,0 +1,11 @@
+env: "local"
+data_provider: "mysql"
+mysql_settings:
+  host: "db"
+  port: 3306
+  user: "root"
+  password: "password"
+  db: "sso"
+token_ttl: 1h
+grpc:
+  port: 5500

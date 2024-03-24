@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/OLO-backend.iml" filepath="$PROJECT_DIR$/.idea/OLO-backend.iml" />
-      <module fileurl="file://$USER_HOME$/protos/.idea/protos.iml" filepath="$USER_HOME$/protos/.idea/protos.iml" />
     </modules>
   </component>
 </project>
