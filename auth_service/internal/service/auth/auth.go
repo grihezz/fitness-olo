@@ -13,7 +13,6 @@ import (
 )
 
 var ErrInvalidCredentials = errors.New("invalid credentials")
-var ErrInvalidAppID = errors.New("invalid app")
 
 type Auth struct {
 	log         *slog.Logger
