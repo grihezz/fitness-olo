@@ -64,7 +64,7 @@ func fetchConfigPath() string {
 		res = os.Getenv("CONFIG_PATH")
 	}
 	if res == "" {
-		res = "auth_service/resourse/config.yml"
+		res = "auth_service/resourse/dev/config.yml"
 	}
 
 	return res

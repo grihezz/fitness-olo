@@ -2,7 +2,7 @@ package main
 
 import (
 	"OLO-backend/api_gateway/internal/app"
-	slogpretty "OLO-backend/api_gateway/internal/logger/handlers"
+	slogpretty "OLO-backend/api_gateway/internal/utils/logger/handlers"
 	"log/slog"
 	"os"
 	"os/signal"

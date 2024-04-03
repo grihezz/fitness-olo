@@ -13,9 +13,6 @@ RUN go mod download
 
 COPY . .
 
-ENV CONFIG_PATH api_gateway/resourse/config.yml
-
-
-EXPOSE 5060
+RUN go build -o main ./api_gateway/cmd/main.go
 
 CMD ["./main"]

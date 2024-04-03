@@ -13,9 +13,6 @@ RUN go mod download
 
 COPY . .
 
-ENV CONFIG_PATH auth_service/resourse/config.yml
-
-
-EXPOSE 5500
+RUN go build -o main ./auth_service/cmd/main.go
 
 CMD ["./main"]
