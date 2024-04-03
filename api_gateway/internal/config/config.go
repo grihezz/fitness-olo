@@ -22,6 +22,7 @@ func (h HTTPConfig) ToStr() string {
 }
 
 type Config struct {
+	Env         string      `yaml:"env" env-default:"local"`
 	AuthService AuthService `yaml:"auth_service"`
 	HTTP        HTTPConfig  `yaml:"http"`
 }
@@ -45,12 +46,14 @@ func MustLoad() *Config {
 
 func fetchConfigPath() string {
 	var res string
-	flag.StringVar(&res, "config", "", "path to config file")
+	flag.StringVar(&res, "config", "", "api_gateway/resourse/config.yml")
 	flag.Parse()
 
 	if res == "" {
 		res = os.Getenv("CONFIG_PATH")
 	}
-
+	if res == "" {
+		res = "api_gateway/resourse/config.yml"
+	}
 	return res
 }

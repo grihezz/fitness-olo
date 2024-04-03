@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: api_gateway/Dockerfile
     ports:
-      - "5000:5000"
+      - "5060:5000"
 
   go-auth-service-app:
     build:

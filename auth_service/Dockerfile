@@ -15,7 +15,6 @@ COPY . .
 
 ENV CONFIG_PATH auth_service/resourse/config.yml
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./auth_service/cmd/main.go
 
 EXPOSE 5500
 

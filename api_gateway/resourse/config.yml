@@ -1,6 +1,6 @@
 auth_service:
-  host: "go-auth-service-app"
-  port: 5500
+  host: "localhost"
+  port: 6000
 http:
   host: ""
-  port: 5000
+  port: 5060

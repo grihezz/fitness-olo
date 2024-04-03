@@ -15,8 +15,7 @@ COPY . .
 
 ENV CONFIG_PATH api_gateway/resourse/config.yml
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./api_gateway/cmd/main.go
 
-EXPOSE 5000
+EXPOSE 5060
 
 CMD ["./main"]
