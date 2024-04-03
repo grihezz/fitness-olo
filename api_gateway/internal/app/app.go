@@ -60,7 +60,8 @@ func (app *App) Start() {
 	corsMux := cors(mux)
 
 	httpAddr := app.config.HTTP.ToStr()
-	log.Info("API Gateway is listening at port", httpAddr)
+
+	log.Info("API Gateway is listening", slog.String("addr", httpAddr))
 	if err := http.ListenAndServe(httpAddr, corsMux); err != nil {
 		log.Error("failed to serve: %v", err)
 	}
