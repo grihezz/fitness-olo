@@ -21,7 +21,7 @@ services:
     environment:
       CONFIG_PATH: api_gateway/resourse/dev/config.yml
     ports:
-      - "5060:5000"
+      - "5070:5000"
 
   go-auth-service-app:
     build:

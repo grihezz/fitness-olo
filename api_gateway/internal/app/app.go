@@ -75,6 +75,7 @@ func allowedOrigin(origin string) bool {
 	}
 	return false
 }
+
 func cors(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if allowedOrigin(r.Header.Get("Origin")) {
