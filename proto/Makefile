@@ -13,6 +13,17 @@ get-deps:
 generate:
 	make generated-auth-api
 
+generate-olo:
+	mkdir -p ../olo_service/generated
+	protoc --proto_path $(CURDIR)/olo --proto_path $(CURDIR)/vendor.protogen \
+	--go_out=$(CURDIR)/../olo_service/generated --go_opt=paths=source_relative \
+	--plugin=protoc-gen-go=$(CURDIR)/bin/protoc-gen-go \
+	--go-grpc_out=$(CURDIR)/../olo_service/generated --go-grpc_opt=paths=source_relative \
+	--plugin=protoc-gen-go-grpc=$(CURDIR)/bin/protoc-gen-go-grpc \
+	--grpc-gateway_out=$(CURDIR)/../olo_service/generated --grpc-gateway_opt paths=source_relative --grpc-gateway_opt generate_unbound_methods=true \
+	--plugin=protoc-gen-grpc-gateway=$(CURDIR)/bin/protoc-gen-grpc-gateway \
+	$(CURDIR)/olo/olo.proto
+
 generated-auth-api:
 	mkdir -p ../auth_service/generated
 	protoc --proto_path $(CURDIR)/auth --proto_path $(CURDIR)/vendor.protogen \
