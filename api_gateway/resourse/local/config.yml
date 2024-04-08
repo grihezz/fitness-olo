@@ -1,6 +1,9 @@
 auth_service:
   host: "localhost"
   port: 6000
+olo_service:
+  host: "localhost"
+  port: 6010
 http:
   host: ""
   port: 5060

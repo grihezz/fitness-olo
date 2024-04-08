@@ -4,15 +4,12 @@ import (
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
-	"time"
 )
 
 type Config struct {
-	Env           string        `yaml:"env" env-default:"local"`
-	DataProvider  string        `yaml:"data_provider" env-required:"true"`
-	GRPC          GRPCConfig    `yaml:"grpc"`
-	MySQLSettings MySQLConfig   `yaml:"mysql_settings"`
-	TokenTTL      time.Duration `yaml:"token_ttl"`
+	Env           string      `yaml:"env" env-default:"local"`
+	GRPC          GRPCConfig  `yaml:"grpc"`
+	MySQLSettings MySQLConfig `yaml:"mysql_settings"`
 }
 
 type GRPCConfig struct {
@@ -27,13 +24,6 @@ type MySQLConfig struct {
 	Username string `yaml:"user"`
 	Password string `yaml:"password"`
 	Database string `yaml:"db"`
-}
-
-type StorageConfig struct {
-	DataProvider string
-
-	// для других бд можно добавить другие настройки
-	MySQLSettings MySQLConfig
 }
 
 // endregion
@@ -64,8 +54,7 @@ func fetchConfigPath() string {
 		res = os.Getenv("CONFIG_PATH")
 	}
 	if res == "" {
-		res = "auth_service/resourse/local/config.yml"
+		res = "olo_service/resourse/local/config.yml"
 	}
-
 	return res
 }

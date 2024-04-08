@@ -1,0 +1,9 @@
+env: "local"
+mysql_settings:
+  host: "db"
+  port: 3306
+  user: "root"
+  password: "password"
+  db: "sso"
+grpc:
+  port: 5501

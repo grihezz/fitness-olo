@@ -1,12 +1,14 @@
 package main
 
 import (
-	"OLO-backend/api_gateway/internal/app"
-	slogpretty "OLO-backend/pkg/utils/logger/handlers"
-	"log/slog"
+	"OLO-backend/olo_service/internal/app"
+	"OLO-backend/olo_service/internal/config"
+	"OLO-backend/pkg/utils/logger/handlers"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"log/slog"
 )
 
 const (
@@ -16,24 +18,24 @@ const (
 )
 
 func main() {
-	log := setupLogger("local")
-	a, err := app.New(log)
-	if err != nil {
-		panic(err)
-		return
-	}
-	a.Start()
+	cfg := config.MustLoad()
+	log := setupLogger(cfg.Env)
+
+	application := app.New(log, cfg)
+	go application.Start()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 	osSignal := <-stop
 	log.Info("stopping application", slog.String("signal", osSignal.String()))
 
+	application.Stop()
 	log.Info("application stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
+
 	switch env {
 	case envLocal:
 		log = setupPrettySlog()
@@ -55,5 +57,6 @@ func setupPrettySlog() *slog.Logger {
 	}
 
 	handler := opts.NewPrettyHandler(os.Stdout)
+
 	return slog.New(handler)
 }

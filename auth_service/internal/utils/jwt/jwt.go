@@ -35,6 +35,7 @@ func (i *Issuer) NewToken(user *models.User, duration time.Duration) (string, er
 	claims := token.Claims.(jwt.MapClaims)
 	claims["uid"] = user.ID
 	claims["email"] = user.Email
+	claims["role"] = user.Role
 	claims["exp"] = time.Now().Add(duration).Unix()
 
 	tokenString, err := token.SignedString(i.key)

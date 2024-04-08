@@ -12,6 +12,11 @@ type AuthService struct {
 	Port int    `yaml:"port"`
 }
 
+type OloService struct {
+	Host string `yaml:"host"`
+	Port int    `yaml:"port"`
+}
+
 type HTTPConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
@@ -24,6 +29,7 @@ func (h HTTPConfig) ToStr() string {
 type Config struct {
 	Env         string      `yaml:"env" env-default:"local"`
 	AuthService AuthService `yaml:"auth_service"`
+	OloService  OloService  `yaml:"olo_service"`
 	HTTP        HTTPConfig  `yaml:"http"`
 }
 
@@ -34,12 +40,12 @@ func MustLoad() *Config {
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		panic("config file is not exist" + path)
+		panic("config file is not exist " + path)
 	}
 
 	var cfg Config
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
-		panic("failed to read config" + err.Error())
+		panic("failed to read config " + err.Error())
 	}
 	return &cfg
 }

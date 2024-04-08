@@ -1,6 +1,9 @@
 auth_service:
   host: "go-auth-service-app"
   port: 5500
+olo_service:
+  host: "go-olo-service-app"
+  port: 5501
 http:
   host: ""
   port: 5000
