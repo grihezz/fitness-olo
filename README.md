@@ -14,25 +14,22 @@
 Ссылки на ПО приведенные выше:
 
 Windows:
-https://www.jetbrains.com/ru-ru/go/ - Goland
-https://gcc.gnu.org/ - компилятор gcc
-https://gnuwin32.sourceforge.net/packages/make.htm - утилита Make 
-https://grpc.io/docs/protoc-installation/ - утилита protoc
-https://git-scm.com/downloads - git
-https://docs.docker.com/get-docker/ - Docker
-https://docs.docker.com/compose/install/ - docker-compose 
-https://pkg.go.dev/github.com/golang/protobuf/protoc-gen-go - protoc-gen-go
+1. https://www.jetbrains.com/ru-ru/go/ - Goland
+2. https://gcc.gnu.org/ - компилятор gcc
+3. https://gnuwin32.sourceforge.net/packages/make.htm - утилита Make 
+4. https://grpc.io/docs/protoc-installation/ - утилита protoc
+5. https://git-scm.com/downloads - git
+6. https://docs.docker.com/get-docker/ - Docker
+7. https://docs.docker.com/compose/install/ - docker-compose 
 
 MacOS:
-https://www.jetbrains.com/ru-ru/go/ - Goland
-В терминале: brew install gcc - компилятор gcc
-В терминале: brew install make - утилита Make
-В терминале: brew install make - утилита Make
-В треминале: brew install protoc-gen-go-grpc - protoc-gen-go-grpc 
-В треминале: brew install protoc-gen-go - protoc-gen-go
-https://git-scm.com/downloads - git
-https://docs.docker.com/get-docker/ - Docker
-В треминале: brew install docker-compose - docker-compose 
+1. https://www.jetbrains.com/ru-ru/go/ - Goland
+2. В терминале: brew install gcc - компилятор gcc
+3. В терминале: brew install make - утилита Make
+4. В терминале: brew install make - утилита Make
+5. https://git-scm.com/downloads - git
+6. https://docs.docker.com/get-docker/ - Docker
+7. В треминале: brew install docker-compose - docker-compose 
 
 Пошаговая инструкция, которая поможет войти в среду разработки.
 
