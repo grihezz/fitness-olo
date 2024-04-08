@@ -13,6 +13,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./auth_service/cmd/main.go
+RUN go build -o main ./olo_service/cmd/main.go
 
 CMD ["./main"]

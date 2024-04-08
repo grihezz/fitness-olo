@@ -3,7 +3,7 @@ package main
 import (
 	"OLO-backend/auth_service/internal/app"
 	"OLO-backend/auth_service/internal/config"
-	"OLO-backend/auth_service/internal/utils/logger/handlers"
+	"OLO-backend/pkg/utils/logger/handlers"
 	"os"
 	"os/signal"
 	"syscall"

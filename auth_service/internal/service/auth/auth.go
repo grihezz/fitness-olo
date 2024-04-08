@@ -3,7 +3,7 @@ package auth
 import (
 	"OLO-backend/auth_service/internal/storage"
 	"OLO-backend/auth_service/internal/utils/jwt"
-	"OLO-backend/auth_service/internal/utils/logger/sl"
+	"OLO-backend/pkg/utils/logger/sl"
 	"context"
 	"errors"
 	"fmt"

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"OLO-backend/auth_service/internal/app"
-	"OLO-backend/auth_service/internal/config"
-	"OLO-backend/auth_service/internal/utils/logger/handlers"
+	"OLO-backend/olo_service/internal/app"
+	"OLO-backend/olo_service/internal/config"
+	"OLO-backend/pkg/utils/logger/handlers"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,14 +22,14 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	application := app.New(log, cfg)
-	go application.GRPCSrv.MustRun()
+	go application.Start()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 	osSignal := <-stop
 	log.Info("stopping application", slog.String("signal", osSignal.String()))
 
-	application.GRPCSrv.Stop()
+	application.Stop()
 	log.Info("application stopped")
 }
 

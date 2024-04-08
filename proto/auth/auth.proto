@@ -8,15 +8,15 @@ option go_package = "/auth_service/generated";
 
 service Auth {
   rpc Register (RegisterRequest) returns (RegisterResponse){
-    option (google.api.http).post = "/sso/v2/auth/register";
+    option (google.api.http).post = "/api/auth/register";
     option (google.api.http).body = "*";
   }
   rpc Login (LoginRequest) returns (LoginResponce){
-    option (google.api.http).post = "/sso/v2/auth/login";
+    option (google.api.http).post = "/api/auth/login";
     option (google.api.http).body = "*";
   }
   rpc IsAdmin (IsAdminRequest) returns (IsAdminResponce){
-    option (google.api.http).post = "/sso/v2/auth/is_admin";
+    option (google.api.http).post = "/api/auth/is_admin";
     option (google.api.http).body = "*";
   }
 }

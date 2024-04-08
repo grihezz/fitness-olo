@@ -4,15 +4,12 @@ import (
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
-	"time"
 )
 
 type Config struct {
-	Env           string        `yaml:"env" env-default:"local"`
-	DataProvider  string        `yaml:"data_provider" env-required:"true"`
-	GRPC          GRPCConfig    `yaml:"grpc"`
-	MySQLSettings MySQLConfig   `yaml:"mysql_settings"`
-	TokenTTL      time.Duration `yaml:"token_ttl"`
+	Env           string      `yaml:"env" env-default:"local"`
+	GRPC          GRPCConfig  `yaml:"grpc"`
+	MySQLSettings MySQLConfig `yaml:"mysql_settings"`
 }
 
 type GRPCConfig struct {
@@ -29,13 +26,6 @@ type MySQLConfig struct {
 	Database string `yaml:"db"`
 }
 
-type StorageConfig struct {
-	DataProvider string
-
-	// для других бд можно добавить другие настройки
-	MySQLSettings MySQLConfig
-}
-
 // endregion
 
 func MustLoad() *Config {
@@ -45,12 +35,12 @@ func MustLoad() *Config {
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		panic("config file is not exist" + path)
+		panic("config file is not exist " + path)
 	}
 
 	var cfg Config
 	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
-		panic("failed to read config" + err.Error())
+		panic("failed to read config " + err.Error())
 	}
 	return &cfg
 }

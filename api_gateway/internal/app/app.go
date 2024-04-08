@@ -3,6 +3,7 @@ package app
 import (
 	"OLO-backend/api_gateway/internal/entity"
 	pauth "OLO-backend/auth_service/generated"
+	polo "OLO-backend/olo_service/generated"
 	"fmt"
 	"log/slog"
 	"regexp"
@@ -56,6 +57,17 @@ func (app *App) Start() {
 		}
 	})
 	defer authConn.Close()
+
+	oloConn := app.initService(entity.Socket{
+		Host: app.config.OloService.Host,
+		Port: app.config.OloService.Port,
+	}, func(conn *grpc.ClientConn) {
+		err := polo.RegisterOLOHandler(context.Background(), mux, conn)
+		if err != nil {
+			log.Info("Failed to register service: %v", err)
+		}
+	})
+	defer oloConn.Close()
 
 	corsMux := cors(mux)
 
