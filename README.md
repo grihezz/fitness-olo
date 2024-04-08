@@ -61,8 +61,8 @@ MacOS:
 Для управления версиями мы используем SemVer. Информацию о доступных версиях см. в тегах в этом репозитории.
 
 Авторы
-Бабоха Григорий - golang-developer /teamlead
-Агафонов Андрей - golang-developer /dev-ops
+* Бабоха Григорий - golang-developer /teamlead
+* Агафонов Андрей - golang-developer /dev-ops
 
 Лицензия
 
