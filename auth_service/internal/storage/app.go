@@ -17,7 +17,7 @@ func (s *InMysqlStorage) initTableApps() {
 	// Создание таблицы auth_data, если она еще не существует
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableNameApp + " (" +
 		"id INT NOT NULL PRIMARY KEY, " +
-		"name VARCHAR(255) NOT NULL UNIQUE, " +
+		"name VARCHAR(20) NOT NULL UNIQUE, " +
 		"secret VARCHAR(10) NOT NULL UNIQUE" +
 		")")
 	if err != nil {

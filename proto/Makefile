@@ -27,7 +27,6 @@ generate-olo:
 
 generated-migration_for_service_olo:
 	migrate -path $(CURDIR)/../olo_service/schema -database 'mysql://root:password@tcp(localhost:5055)/sso?x-tls-insecure-skip-verify=true' up
-
 generated-auth-api:
 	mkdir -p ../auth_service/generated
 	protoc --proto_path $(CURDIR)/auth --proto_path $(CURDIR)/generated/vendor.protogen \

@@ -30,6 +30,27 @@ service OLO {
       get: "/api/olo/getUserWidgets"
     };
   }
+
+  rpc GetAllArticles (GetAllArticlesRequest) returns (GetAllArticlesResponce) {
+    option (google.api.http) = {
+      get: "/api/olo/articles"
+    };
+  }
+  rpc AddArticleForUser (AddArticleForUserRequest) returns (AddArticleForUserResponse){
+    option (google.api.http).post = "/api/olo/addArticleForUser";
+    option (google.api.http).body = "*";
+  }
+
+  rpc GetUsersArticles (GetAllArticlesRequest) returns (GetAllArticlesResponce){
+    option (google.api.http) = {
+      get: "/api/olo/getUserArticles"
+    };
+  }
+}
+message GetAllArticlesRequest {}
+
+message GetAllArticlesResponce {
+  repeated Article articles = 1;
 }
 
 message helloUserRequest {}
@@ -46,6 +67,15 @@ message AddWidgetForUserResponse {
   string response = 1;
 }
 
+message AddArticleForUserRequest {
+  int64 articleId = 1;
+}
+
+message AddArticleForUserResponse {
+  string response = 1;
+}
+
+
 message GetWidgetsRequest {}
 
 message GetWidgetsResponse {
@@ -55,4 +85,8 @@ message GetWidgetsResponse {
 message Widget {
   uint64 id = 1;
   string description = 2;
+}
+message Article {
+  uint64 id = 1;
+  string header = 2;
 }

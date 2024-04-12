@@ -80,6 +80,16 @@ func (h *OloHandler) mapToProtoModelWidgets(widgets []entity.Widget) []*generate
 	}
 	return result
 }
+func (h *OloHandler) mapToProtoModelArticles(articles []entity.Article) []*generated.Article {
+	var result []*generated.Article
+	for _, article := range articles {
+		result = append(result, &generated.Article{
+			Id:     uint64(article.ID),
+			Header: article.Header,
+		})
+	}
+	return result
+}
 
 func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
 	_, err := h.tokenFromContextMetadata(ctx)
@@ -126,5 +136,53 @@ func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWid
 		Response: fmt.Sprintf(
 			"Successfully add widget (%d) for user (%d)!",
 			req.WidgetId, user.ID),
+	}, nil
+}
+
+func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponce, error) {
+	token, err := h.tokenFromContextMetadata(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get token: %w", err)
+	}
+	user := h.newEntityUseToken(token)
+	articles, err := h.service.GetUsersArticles(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &generated.GetAllArticlesResponce{
+		Articles: h.mapToProtoModelArticles(articles),
+	}, nil
+}
+
+func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponce, error) {
+	_, err := h.tokenFromContextMetadata(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get token: %w", err)
+	}
+	articles, err := h.service.GetAllArticles()
+	if err != nil {
+		return nil, err
+	}
+
+	return &generated.GetAllArticlesResponce{
+		Articles: h.mapToProtoModelArticles(articles),
+	}, nil
+}
+
+func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.AddArticleForUserRequest) (*generated.AddArticleForUserResponse, error) {
+	token, err := h.tokenFromContextMetadata(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get token: %w", err)
+	}
+	user := h.newEntityUseToken(token)
+	err = h.service.AddArticleForUser(req.ArticleId, user.ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not add article to user %w", err)
+	}
+	return &generated.AddArticleForUserResponse{
+		Response: fmt.Sprintf(
+			"Successfully add article (%d) for user (%d)!",
+			req.ArticleId, user.ID),
 	}, nil
 }
