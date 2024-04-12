@@ -7,18 +7,22 @@ import "google/api/annotations.proto";
 option go_package = "/auth_service/generated";
 
 service Auth {
-  rpc Register (RegisterRequest) returns (RegisterResponse){
+
+  rpc Register (RegisterRequest) returns (RegisterResponse) {
     option (google.api.http).post = "/api/auth/register";
     option (google.api.http).body = "*";
   }
-  rpc Login (LoginRequest) returns (LoginResponce){
+
+  rpc Login (LoginRequest) returns (LoginResponse) {
     option (google.api.http).post = "/api/auth/login";
     option (google.api.http).body = "*";
   }
-  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponce){
+
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
     option (google.api.http).post = "/api/auth/is_admin";
     option (google.api.http).body = "*";
   }
+
 }
 
 message RegisterRequest {
@@ -36,7 +40,7 @@ message LoginRequest {
   int32 app_id = 3;
 }
 
-message LoginResponce{
+message LoginResponse {
   string token = 1;
 }
 
@@ -44,6 +48,6 @@ message IsAdminRequest {
   int64 user_id = 1;
 }
 
-message IsAdminResponce {
+message IsAdminResponse {
   bool is_admin = 1;
 }

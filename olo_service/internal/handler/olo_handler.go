@@ -139,7 +139,7 @@ func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWid
 	}, nil
 }
 
-func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponce, error) {
+func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	token, err := h.tokenFromContextMetadata(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get token: %w", err)
@@ -150,12 +150,12 @@ func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAll
 		return nil, err
 	}
 
-	return &generated.GetAllArticlesResponce{
+	return &generated.GetAllArticlesResponse{
 		Articles: h.mapToProtoModelArticles(articles),
 	}, nil
 }
 
-func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponce, error) {
+func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	_, err := h.tokenFromContextMetadata(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get token: %w", err)
@@ -165,7 +165,7 @@ func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllAr
 		return nil, err
 	}
 
-	return &generated.GetAllArticlesResponce{
+	return &generated.GetAllArticlesResponse{
 		Articles: h.mapToProtoModelArticles(articles),
 	}, nil
 }
