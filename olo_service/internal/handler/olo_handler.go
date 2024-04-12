@@ -3,6 +3,7 @@ package handler
 import (
 	"OLO-backend/olo_service/generated"
 	"OLO-backend/olo_service/internal/entity"
+	"OLO-backend/olo_service/internal/mapper"
 	"OLO-backend/olo_service/internal/service"
 	"OLO-backend/olo_service/internal/utils/jwt"
 	"context"
@@ -15,6 +16,7 @@ import (
 type OloHandler struct {
 	service   *service.OloService
 	validator *jwt.Validator
+	mapper    mapper.Mapper
 	generated.UnimplementedOLOServer
 }
 
@@ -22,6 +24,7 @@ func NewOloHandler(service *service.OloService, validator *jwt.Validator) *OloHa
 	return &OloHandler{
 		service:   service,
 		validator: validator,
+		mapper:    mapper.NewMapperImpl(),
 	}
 }
 
@@ -70,27 +73,6 @@ func (h *OloHandler) HelloUser(ctx context.Context, req *generated.HelloUserRequ
 	}, nil
 }
 
-func (h *OloHandler) mapToProtoModelWidgets(widgets []entity.Widget) []*generated.Widget {
-	var result []*generated.Widget
-	for _, widget := range widgets {
-		result = append(result, &generated.Widget{
-			Id:          uint64(widget.ID),
-			Description: widget.Description,
-		})
-	}
-	return result
-}
-func (h *OloHandler) mapToProtoModelArticles(articles []entity.Article) []*generated.Article {
-	var result []*generated.Article
-	for _, article := range articles {
-		result = append(result, &generated.Article{
-			Id:     uint64(article.ID),
-			Header: article.Header,
-		})
-	}
-	return result
-}
-
 func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
 	_, err := h.tokenFromContextMetadata(ctx)
 	if err != nil {
@@ -100,9 +82,8 @@ func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidget
 	if err != nil {
 		return nil, err
 	}
-
 	return &generated.GetWidgetsResponse{
-		Widgets: h.mapToProtoModelWidgets(widgets),
+		Widgets: h.mapper.WidgetsProtoToEntity(widgets),
 	}, nil
 }
 
@@ -118,7 +99,7 @@ func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidge
 	}
 
 	return &generated.GetWidgetsResponse{
-		Widgets: h.mapToProtoModelWidgets(widgets),
+		Widgets: h.mapper.WidgetsProtoToEntity(widgets),
 	}, nil
 }
 
@@ -151,7 +132,7 @@ func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAll
 	}
 
 	return &generated.GetAllArticlesResponse{
-		Articles: h.mapToProtoModelArticles(articles),
+		Articles: h.mapper.ArticlesProtoToEntity(articles),
 	}, nil
 }
 
@@ -166,7 +147,7 @@ func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllAr
 	}
 
 	return &generated.GetAllArticlesResponse{
-		Articles: h.mapToProtoModelArticles(articles),
+		Articles: h.mapper.ArticlesProtoToEntity(articles),
 	}, nil
 }
 
