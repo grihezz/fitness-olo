@@ -1,39 +1,40 @@
 package mapper
 
-import (
-	"OLO-backend/olo_service/generated"
-	"OLO-backend/olo_service/internal/entity"
-)
+type MapFunc[T any, U any] func(T) U
 
-type Mapper interface {
-	WidgetsProtoToEntity([]entity.Widget) []*generated.Widget
-	ArticlesProtoToEntity([]entity.Article) []*generated.Article
+// Map is a aliased call to the underlying function, it is optional
+// to define this method, but it can be useful for readability.
+func (a MapFunc[T, U]) Map(v T) U {
+	return a(v)
 }
 
-type MapperImpl struct{}
-
-func NewMapperImpl() MapperImpl {
-	return MapperImpl{}
-}
-
-func (m MapperImpl) WidgetsProtoToEntity(widgets []entity.Widget) []*generated.Widget {
-	var result []*generated.Widget
-	for _, widget := range widgets {
-		result = append(result, &generated.Widget{
-			Id:          uint64(widget.ID),
-			Description: widget.Description,
-		})
+// MapEach is a convenience method for mapping a slice of items to a slice of
+// the same length of a different type.
+func (a MapFunc[T, U]) MapEach(v []T) []U {
+	result := make([]U, len(v))
+	for i, item := range v {
+		result[i] = a(item)
 	}
 	return result
 }
 
-func (m MapperImpl) ArticlesProtoToEntity(articles []entity.Article) []*generated.Article {
-	var result []*generated.Article
-	for _, article := range articles {
-		result = append(result, &generated.Article{
-			Id:     uint64(article.ID),
-			Header: article.Header,
-		})
+// MapErr is a convenience method for mapping a value to a different type
+// and returning an error if one is provided.
+func (a MapFunc[T, U]) MapErr(v T, err error) (U, error) {
+	if err != nil {
+		var zero U
+		return zero, err
 	}
-	return result
+
+	return a(v), nil
+}
+
+// MapEachErr is a convenience method for mapping a slice of items to a slice of
+// the same length of a different type, and returning an error if one is provided.
+func (a MapFunc[T, U]) MapEachErr(v []T, err error) ([]U, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	return a.MapEach(v), nil
 }
