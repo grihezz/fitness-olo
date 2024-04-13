@@ -14,20 +14,37 @@ service OLO {
     };
   }
 
-  rpc GetAllWidgets (GetWidgetsRequest) returns (GetWidgetsResponse){
+  rpc GetAllWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
     option (google.api.http) = {
       get: "/api/olo/getAllWidgets"
     };
   }
 
-  rpc AddWidgetForUser (AddWidgetForUserRequest) returns (AddWidgetForUserResponse){
+  rpc AddWidgetForUser (AddWidgetForUserRequest) returns (AddWidgetForUserResponse) {
     option (google.api.http).post = "/api/olo/addWidgetForUser";
     option (google.api.http).body = "*";
   }
 
-  rpc GetUserWidgets (GetWidgetsRequest) returns (GetWidgetsResponse){
+  rpc GetUserWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
     option (google.api.http) = {
       get: "/api/olo/getUserWidgets"
+    };
+  }
+
+  rpc GetAllArticles (GetAllArticlesRequest) returns (GetAllArticlesResponse) {
+    option (google.api.http) = {
+      get: "/api/olo/articles"
+    };
+  }
+
+  rpc AddArticleForUser (AddArticleForUserRequest) returns (AddArticleForUserResponse) {
+    option (google.api.http).post = "/api/olo/addArticleForUser";
+    option (google.api.http).body = "*";
+  }
+
+  rpc GetUsersArticles (GetAllArticlesRequest) returns (GetAllArticlesResponse) {
+    option (google.api.http) = {
+      get: "/api/olo/getUserArticles"
     };
   }
 }
@@ -36,6 +53,11 @@ message helloUserRequest {}
 
 message helloUserResponse {
   string message = 1;
+}
+
+message Widget {
+  uint64 id = 1;
+  string description = 2;
 }
 
 message AddWidgetForUserRequest {
@@ -52,7 +74,21 @@ message GetWidgetsResponse {
   repeated Widget widgets = 1;
 }
 
-message Widget {
+message Article {
   uint64 id = 1;
-  string description = 2;
+  string header = 2;
+}
+
+message GetAllArticlesRequest {}
+
+message GetAllArticlesResponse {
+  repeated Article articles = 1;
+}
+
+message AddArticleForUserRequest {
+  int64 articleId = 1;
+}
+
+message AddArticleForUserResponse {
+  string response = 1;
 }

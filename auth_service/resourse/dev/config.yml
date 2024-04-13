@@ -6,6 +6,6 @@ mysql_settings:
   user: "root"
   password: "password"
   db: "sso"
-token_ttl: 1h
+token_ttl: 24h
 grpc:
   port: 5500

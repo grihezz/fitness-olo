@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 	"net/http"
 )
 
@@ -31,51 +30,51 @@ func New(log *slog.Logger) (app *App, err error) {
 	return
 }
 
-func (app *App) initService(s entity.Socket, fn func(conn *grpc.ClientConn)) *grpc.ClientConn {
-	clientConn, err := grpc.Dial(fmt.Sprintf("%s:%d", s.Host, s.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect to service: %v", err)
-	}
-	fn(clientConn)
-	return clientConn
+func (app *App) initService(s entity.Socket, fn func(formattedAddr string)) {
+	fn(fmt.Sprintf("%s:%d", s.Host, s.Port))
 }
 
 func (app *App) Start() {
 	const op = "httpSrv.Start"
-	log := app.log.With(
+
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	logger := app.log.With(
 		slog.String("op", op),
 		slog.Int("http_port", app.config.HTTP.Port),
 	)
+
 	mux := runtime.NewServeMux()
-	authConn := app.initService(entity.Socket{
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	app.initService(entity.Socket{
 		Host: app.config.AuthService.Host,
 		Port: app.config.AuthService.Port,
-	}, func(conn *grpc.ClientConn) {
-		err := pauth.RegisterAuthHandler(context.Background(), mux, conn)
+	}, func(formattedAddr string) {
+		err := pauth.RegisterAuthHandlerFromEndpoint(ctx, mux, formattedAddr, opts)
 		if err != nil {
-			log.Info("Failed to register service: %v", err)
+			logger.Error("can`t register service: %v", err)
 		}
 	})
-	defer authConn.Close()
 
-	oloConn := app.initService(entity.Socket{
+	app.initService(entity.Socket{
 		Host: app.config.OloService.Host,
 		Port: app.config.OloService.Port,
-	}, func(conn *grpc.ClientConn) {
-		err := polo.RegisterOLOHandler(context.Background(), mux, conn)
+	}, func(formattedAddr string) {
+		err := polo.RegisterOLOHandlerFromEndpoint(ctx, mux, formattedAddr, opts)
 		if err != nil {
-			log.Info("Failed to register service: %v", err)
+			logger.Error("Failed to register service: %v", err)
 		}
 	})
-	defer oloConn.Close()
 
 	corsMux := cors(mux)
-
 	httpAddr := app.config.HTTP.ToStr()
 
-	log.Info("API Gateway is listening", slog.String("addr", httpAddr))
+	logger.Info("API Gateway is listening", slog.String("addr", httpAddr))
 	if err := http.ListenAndServe(httpAddr, corsMux); err != nil {
-		log.Error("failed to serve: %v", err)
+		logger.Error("failed to serve: %v", err)
 	}
 }
 

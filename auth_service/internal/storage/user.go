@@ -18,8 +18,8 @@ func (s *InMysqlStorage) initTableUser() {
 	// Создание таблицы auth_data, если она еще не существует
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableNameUser + " (" +
 		"id BIGINT NOT NULL AUTO_INCREMENT, " +
-		"email VARCHAR(255) NOT NULL UNIQUE, " +
-		"role VARCHAR(10) NOT NULL DEFAULT \"USER\", " +
+		"email VARCHAR(35) NOT NULL UNIQUE, " +
+		"role VARCHAR(5) NOT NULL DEFAULT \"USER\", " +
 		"password_hash VARCHAR(64) NOT NULL, " +
 		"date_register TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
 		"PRIMARY KEY (id)" +
