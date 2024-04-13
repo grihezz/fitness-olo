@@ -3,18 +3,37 @@ package handler
 import (
 	"OLO-backend/olo_service/generated"
 	"OLO-backend/olo_service/internal/entity"
+	"OLO-backend/olo_service/internal/mapper"
 	"OLO-backend/olo_service/internal/service"
 	"OLO-backend/olo_service/internal/utils/jwt"
 	"context"
 	"errors"
 	"fmt"
-	jwt_go "github.com/golang-jwt/jwt/v5"
+	jwtgo "github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"
 )
+
+func ArticleToArticleResponse(article entity.Article) *generated.Article {
+	return &generated.Article{
+		Id:     uint64(article.ID),
+		Header: article.Header,
+	}
+}
+
+func WidgetToWidgetResponse(widget entity.Widget) *generated.Widget {
+	return &generated.Widget{
+		Id:          uint64(widget.ID),
+		Description: widget.Description,
+	}
+}
 
 type OloHandler struct {
 	service   *service.OloService
 	validator *jwt.Validator
+
+	mapperWidget  mapper.MapFunc[entity.Widget, *generated.Widget]
+	mapperArticle mapper.MapFunc[entity.Article, *generated.Article]
+
 	generated.UnimplementedOLOServer
 }
 
@@ -22,10 +41,13 @@ func NewOloHandler(service *service.OloService, validator *jwt.Validator) *OloHa
 	return &OloHandler{
 		service:   service,
 		validator: validator,
+
+		mapperWidget:  WidgetToWidgetResponse,
+		mapperArticle: ArticleToArticleResponse,
 	}
 }
 
-func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwt_go.Token, error) {
+func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwtgo.Token, error) {
 	// rip the token from the metadata via the context
 	headers, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -45,10 +67,18 @@ func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwt_go.Toke
 	return token, nil
 }
 
-func (h *OloHandler) newEntityUseToken(token *jwt_go.Token) entity.User {
-	id := int64(token.Claims.(jwt_go.MapClaims)["uid"].(float64))
-	email := token.Claims.(jwt_go.MapClaims)["email"].(string)
-	role := token.Claims.(jwt_go.MapClaims)["role"].(string)
+func (h *OloHandler) getToken(ctx context.Context) (*jwtgo.Token, error) {
+	token, err := h.tokenFromContextMetadata(ctx)
+	if err != nil {
+		return nil, errors.Join(err, fmt.Errorf("can't get token"))
+	}
+	return token, nil
+}
+
+func (h *OloHandler) newEntityUseToken(token *jwtgo.Token) entity.User {
+	id := int64(token.Claims.(jwtgo.MapClaims)["uid"].(float64))
+	email := token.Claims.(jwtgo.MapClaims)["email"].(string)
+	role := token.Claims.(jwtgo.MapClaims)["role"].(string)
 
 	return entity.User{
 		ID:    id,
@@ -58,9 +88,9 @@ func (h *OloHandler) newEntityUseToken(token *jwt_go.Token) entity.User {
 }
 
 func (h *OloHandler) HelloUser(ctx context.Context, req *generated.HelloUserRequest) (*generated.HelloUserResponse, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	user := h.newEntityUseToken(token)
 	return &generated.HelloUserResponse{
@@ -70,46 +100,24 @@ func (h *OloHandler) HelloUser(ctx context.Context, req *generated.HelloUserRequ
 	}, nil
 }
 
-func (h *OloHandler) mapToProtoModelWidgets(widgets []entity.Widget) []*generated.Widget {
-	var result []*generated.Widget
-	for _, widget := range widgets {
-		result = append(result, &generated.Widget{
-			Id:          uint64(widget.ID),
-			Description: widget.Description,
-		})
-	}
-	return result
-}
-func (h *OloHandler) mapToProtoModelArticles(articles []entity.Article) []*generated.Article {
-	var result []*generated.Article
-	for _, article := range articles {
-		result = append(result, &generated.Article{
-			Id:     uint64(article.ID),
-			Header: article.Header,
-		})
-	}
-	return result
-}
-
 func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
-	_, err := h.tokenFromContextMetadata(ctx)
+	_, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	widgets, err := h.service.GetAllWidgets()
 	if err != nil {
 		return nil, err
 	}
-
 	return &generated.GetWidgetsResponse{
-		Widgets: h.mapToProtoModelWidgets(widgets),
+		Widgets: h.mapperWidget.MapEach(widgets),
 	}, nil
 }
 
 func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	user := h.newEntityUseToken(token)
 	widgets, err := h.service.GetUserWidgets(user.ID)
@@ -118,19 +126,19 @@ func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidge
 	}
 
 	return &generated.GetWidgetsResponse{
-		Widgets: h.mapToProtoModelWidgets(widgets),
+		Widgets: h.mapperWidget.MapEach(widgets),
 	}, nil
 }
 
 func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWidgetForUserRequest) (*generated.AddWidgetForUserResponse, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	user := h.newEntityUseToken(token)
 	err = h.service.AddWidgetForUser(req.WidgetId, user.ID)
 	if err != nil {
-		return nil, fmt.Errorf("could not add widget to user %w", err)
+		return nil, err
 	}
 	return &generated.AddWidgetForUserResponse{
 		Response: fmt.Sprintf(
@@ -140,9 +148,9 @@ func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWid
 }
 
 func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	user := h.newEntityUseToken(token)
 	articles, err := h.service.GetUsersArticles(user.ID)
@@ -151,14 +159,14 @@ func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAll
 	}
 
 	return &generated.GetAllArticlesResponse{
-		Articles: h.mapToProtoModelArticles(articles),
+		Articles: h.mapperArticle.MapEach(articles),
 	}, nil
 }
 
 func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
-	_, err := h.tokenFromContextMetadata(ctx)
+	_, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	articles, err := h.service.GetAllArticles()
 	if err != nil {
@@ -166,19 +174,19 @@ func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllAr
 	}
 
 	return &generated.GetAllArticlesResponse{
-		Articles: h.mapToProtoModelArticles(articles),
+		Articles: h.mapperArticle.MapEach(articles),
 	}, nil
 }
 
 func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.AddArticleForUserRequest) (*generated.AddArticleForUserResponse, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get token: %w", err)
+		return nil, err
 	}
 	user := h.newEntityUseToken(token)
 	err = h.service.AddArticleForUser(req.ArticleId, user.ID)
 	if err != nil {
-		return nil, fmt.Errorf("could not add article to user %w", err)
+		return nil, err
 	}
 	return &generated.AddArticleForUserResponse{
 		Response: fmt.Sprintf(
