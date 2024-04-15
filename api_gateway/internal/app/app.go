@@ -69,10 +69,6 @@ func (app *App) Start() {
 	})
 
 	withCors := cors.New(cors.Options{
-		AllowOriginFunc:  func(origin string) bool { return true },
-		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}).Handler(mux)
