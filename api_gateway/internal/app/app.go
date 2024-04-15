@@ -1,17 +1,16 @@
 package app
 
 import (
+	"OLO-backend/api_gateway/internal/config"
 	"OLO-backend/api_gateway/internal/entity"
 	pauth "OLO-backend/auth_service/generated"
 	polo "OLO-backend/olo_service/generated"
+	"context"
 	"fmt"
 	"log/slog"
-	"regexp"
 
-	"OLO-backend/api_gateway/internal/config"
-	"context"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/spf13/viper"
+	"github.com/rs/cors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
@@ -69,35 +68,19 @@ func (app *App) Start() {
 		}
 	})
 
-	corsMux := cors(mux)
+	withCors := cors.New(cors.Options{
+		AllowOriginFunc:  func(origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}).Handler(mux)
+
 	httpAddr := app.config.HTTP.ToStr()
 
 	logger.Info("API Gateway is listening", slog.String("addr", httpAddr))
-	if err := http.ListenAndServe(httpAddr, corsMux); err != nil {
+	if err := http.ListenAndServe(httpAddr, withCors); err != nil {
 		logger.Error("failed to serve: %v", err)
 	}
-}
-
-func allowedOrigin(origin string) bool {
-	if viper.GetString("cors") == "*" {
-		return true
-	}
-	if matched, _ := regexp.MatchString(viper.GetString("cors"), origin); matched {
-		return true
-	}
-	return false
-}
-
-func cors(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if allowedOrigin(r.Header.Get("Origin")) {
-			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
-		}
-		if r.Method == "OPTIONS" {
-			return
-		}
-		h.ServeHTTP(w, r)
-	})
 }
