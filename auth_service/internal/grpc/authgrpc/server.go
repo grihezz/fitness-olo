@@ -25,7 +25,7 @@ func Register(gRPC *grpc.Server, auth Auth) {
 	generated.RegisterAuthServer(gRPC, &serverAPI{auth: auth})
 }
 
-func (s *serverAPI) Login(ctx context.Context, req *generated.LoginRequest) (*generated.LoginResponce, error) {
+func (s *serverAPI) Login(ctx context.Context, req *generated.LoginRequest) (*generated.LoginResponse, error) {
 	if req.GetEmail() == "" {
 		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
@@ -42,7 +42,7 @@ func (s *serverAPI) Login(ctx context.Context, req *generated.LoginRequest) (*ge
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &generated.LoginResponce{
+	return &generated.LoginResponse{
 		Token: token,
 	}, nil
 }
@@ -64,7 +64,7 @@ func (s *serverAPI) Register(ctx context.Context, req *generated.RegisterRequest
 	}, nil
 }
 
-func (s *serverAPI) IsAdmin(ctx context.Context, req *generated.IsAdminRequest) (*generated.IsAdminResponce, error) {
+func (s *serverAPI) IsAdmin(ctx context.Context, req *generated.IsAdminRequest) (*generated.IsAdminResponse, error) {
 	if err := valideteIsAdmin(req); err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *generated.IsAdminRequest) 
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
-	return &generated.IsAdminResponce{
+	return &generated.IsAdminResponse{
 		IsAdmin: isAdmin,
 	}, nil
 }
