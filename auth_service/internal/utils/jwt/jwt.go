@@ -1,3 +1,6 @@
+// Package jwt provides functionality for working with JSON Web Tokens (JWT).
+//
+// This package includes an Issuer type for creating JWT tokens using a private key.
 package jwt
 
 import (

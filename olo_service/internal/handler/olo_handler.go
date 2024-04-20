@@ -1,3 +1,6 @@
+// Package handler provides gRPC handler functions for OLO service endpoints.
+//
+// This package includes handler functions for handling gRPC requests related to articles and widgets.
 package handler
 
 import (
@@ -13,6 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// ArticleToArticleResponse converts an Article entity to a generated.Article.
 func ArticleToArticleResponse(article entity.Article) *generated.Article {
 	return &generated.Article{
 		Id:     uint64(article.ID),
@@ -20,6 +24,7 @@ func ArticleToArticleResponse(article entity.Article) *generated.Article {
 	}
 }
 
+// WidgetToWidgetResponse converts a Widget entity to a generated.Widget.
 func WidgetToWidgetResponse(widget entity.Widget) *generated.Widget {
 	return &generated.Widget{
 		Id:          uint64(widget.ID),
@@ -27,6 +32,7 @@ func WidgetToWidgetResponse(widget entity.Widget) *generated.Widget {
 	}
 }
 
+// OloHandler represents the gRPC handler for OLO service endpoints.
 type OloHandler struct {
 	service   *service.OloService
 	validator *jwt.Validator
@@ -47,8 +53,8 @@ func NewOloHandler(service *service.OloService, validator *jwt.Validator) *OloHa
 	}
 }
 
+// tokenFromContextMetadata extracts the JWT token from the context metadata.
 func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwtgo.Token, error) {
-	// rip the token from the metadata via the context
 	headers, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, errors.New("no metadata found in context")
@@ -67,6 +73,7 @@ func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwtgo.Token
 	return token, nil
 }
 
+// getToken retrieves and validates the JWT token from the context.
 func (h *OloHandler) getToken(ctx context.Context) (*jwtgo.Token, error) {
 	token, err := h.tokenFromContextMetadata(ctx)
 	if err != nil {
@@ -75,6 +82,7 @@ func (h *OloHandler) getToken(ctx context.Context) (*jwtgo.Token, error) {
 	return token, nil
 }
 
+// newEntityUseToken extracts user information from the JWT token.
 func (h *OloHandler) newEntityUseToken(token *jwtgo.Token) entity.User {
 	id := int64(token.Claims.(jwtgo.MapClaims)["uid"].(float64))
 	email := token.Claims.(jwtgo.MapClaims)["email"].(string)

@@ -1,3 +1,7 @@
+// Package app is the entry point for the OLO-backend API Gateway application
+//
+// The api gateway is responsible for routing incoming requests to the appropriate services
+// and handling cross-cutting concerns such as authentication, rate limiting, and logging.
 package app
 
 import (
@@ -21,6 +25,8 @@ type App struct {
 	port       int
 }
 
+// New is the entry point for the API Gateway application.
+// It initializes the repository and several handlers.
 func New(log *slog.Logger, cfg *config.Config) (app *App) {
 	dbProvider, err := provider.NewMySQLProvider(
 		cfg.MySQLSettings.Address,
