@@ -1,3 +1,4 @@
+// Package storage provides storage implementations for application data.
 package storage
 
 import (
@@ -5,16 +6,16 @@ import (
 	"fmt"
 )
 
+// AppStorage defines methods for interacting with application data.
 type AppStorage interface {
 	GetApp(appID int) (*models.App, error)
 	SaveApp(appID int, name string, secret string) error
 }
 
-// region for mysql Provider
-
+// initTableApps initializes the apps table in MySQL storage.
 func (s *InMysqlStorage) initTableApps() {
 	db := s.mysqlProvider.DB
-	// Создание таблицы auth_data, если она еще не существует
+	// Create the apps table if it doesn't exist
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableNameApp + " (" +
 		"id INT NOT NULL PRIMARY KEY, " +
 		"name VARCHAR(20) NOT NULL UNIQUE, " +
@@ -25,6 +26,7 @@ func (s *InMysqlStorage) initTableApps() {
 	}
 }
 
+// initTestDataForApps initializes test data for apps in MySQL storage.
 func (s *InMysqlStorage) initTestDataForApps() {
 	s.addAppWithIndex(&models.App{
 		ID:     1,
@@ -33,6 +35,7 @@ func (s *InMysqlStorage) initTestDataForApps() {
 	})
 }
 
+// addAppWithIndex adds an app with the specified index to MySQL storage.
 func (s *InMysqlStorage) addAppWithIndex(app *models.App) error {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
@@ -42,6 +45,7 @@ func (s *InMysqlStorage) addAppWithIndex(app *models.App) error {
 	return err
 }
 
+// GetApp retrieves an app by ID from MySQL storage.
 func (s *InMysqlStorage) GetApp(appID int) (*models.App, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
@@ -64,6 +68,7 @@ func (s *InMysqlStorage) GetApp(appID int) (*models.App, error) {
 	return sub, err
 }
 
+// SaveApp saves an app to MySQL storage.
 func (s *InMysqlStorage) SaveApp(appID int, name string, secret string) error {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
@@ -76,5 +81,3 @@ func (s *InMysqlStorage) SaveApp(appID int, name string, secret string) error {
 	})
 	return err
 }
-
-// endregion

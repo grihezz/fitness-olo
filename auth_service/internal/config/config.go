@@ -1,3 +1,5 @@
+// Package config provides functionality for loading application configuration.
+// Пакет config предоставляет функциональность для загрузки конфигурации приложения.
 package config
 
 import (
@@ -7,6 +9,7 @@ import (
 	"time"
 )
 
+// Config represents the application configuration.
 type Config struct {
 	Env           string        `yaml:"env" env-default:"local"`
 	DataProvider  string        `yaml:"data_provider" env-required:"true"`
@@ -15,12 +18,12 @@ type Config struct {
 	TokenTTL      time.Duration `yaml:"token_ttl"`
 }
 
+// GRPCConfig represents gRPC configuration.
 type GRPCConfig struct {
 	Port int `yaml:"port"`
 }
 
-// region databases providers
-
+// MySQLConfig represents MySQL database configuration.
 type MySQLConfig struct {
 	Address  string `yaml:"host"`
 	Port     uint16 `yaml:"port"`
@@ -29,15 +32,7 @@ type MySQLConfig struct {
 	Database string `yaml:"db"`
 }
 
-type StorageConfig struct {
-	DataProvider string
-
-	// для других бд можно добавить другие настройки
-	MySQLSettings MySQLConfig
-}
-
-// endregion
-
+// MustLoad loads the configuration from the specified path.
 func MustLoad() *Config {
 	path := fetchConfigPath()
 	if path == "" {
@@ -55,6 +50,7 @@ func MustLoad() *Config {
 	return &cfg
 }
 
+// fetchConfigPath fetches the path to the configuration file.
 func fetchConfigPath() string {
 	var res string
 	flag.StringVar(&res, "config", "", "path to config file")

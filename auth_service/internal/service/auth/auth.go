@@ -1,3 +1,4 @@
+// Package auth provides functionality for user authentication.
 package auth
 
 import (
@@ -12,8 +13,10 @@ import (
 	"time"
 )
 
+// ErrInvalidCredentials indicates invalid user credentials.
 var ErrInvalidCredentials = errors.New("invalid credentials")
 
+// Auth represents an authentication service.
 type Auth struct {
 	log         *slog.Logger
 	userStorage storage.UserStorage
@@ -21,6 +24,7 @@ type Auth struct {
 	issuer      *jwt.Issuer
 }
 
+// New creates a new instance of the authentication service.
 func New(log *slog.Logger, userStorage storage.UserStorage, jwtIssuer *jwt.Issuer, tokenTTL time.Duration) *Auth {
 	return &Auth{
 		userStorage: userStorage,
@@ -30,6 +34,7 @@ func New(log *slog.Logger, userStorage storage.UserStorage, jwtIssuer *jwt.Issue
 	}
 }
 
+// Login performs user login and returns a JWT token.
 func (a *Auth) Login(ctx context.Context, email string, password string, appID int) (string, error) {
 	const op = "auth.Login"
 
@@ -65,6 +70,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 	return token, nil
 }
 
+// RegisterNewUser registers a new user.
 func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (int64, error) {
 	const op = "auth.RegisterNewUser"
 
@@ -98,6 +104,7 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 	return id, nil
 }
 
+// IsAdmin checks if a user is an admin.
 func (a *Auth) IsAdmin(ctx context.Context, userId int64) (bool, error) {
 	const op = "auth.IsAdmin"
 

@@ -1,5 +1,6 @@
 package models
 
+// Package models provides data models for the application.
 type User struct {
 	ID           int64  `db:"id"`
 	Email        string `db:"email"`

@@ -12,8 +12,8 @@ require (
 	github.com/rs/cors v1.10.1
 	golang.org/x/crypto v0.22.0
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81
-	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda
-	google.golang.org/grpc v1.63.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
+	google.golang.org/grpc v1.63.2
 )
 
 require (
@@ -21,6 +21,7 @@ require (
 	github.com/yuin/goldmark v1.4.13 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/tools v0.20.0 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0 // indirect
 )
 
 require (
@@ -34,7 +35,7 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240325203815-454cdb8f5daa // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415141817-7cd4c1c1f9ec // indirect
 	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
