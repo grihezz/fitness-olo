@@ -22,6 +22,7 @@ type HTTPConfig struct {
 	Port int    `yaml:"port"`
 }
 
+// ToStr returns a string representation of the HTTPConfig, which consists of host and port concatenated with a colon.
 func (h HTTPConfig) ToStr() string {
 	return fmt.Sprintf("%s:%d", h.Host, h.Port)
 }
@@ -33,6 +34,7 @@ type Config struct {
 	HTTP        HTTPConfig  `yaml:"http"`
 }
 
+// MustLoad loads the configuration from the specified path.
 func MustLoad() *Config {
 	path := fetchConfigPath()
 	if path == "" {
@@ -50,6 +52,7 @@ func MustLoad() *Config {
 	return &cfg
 }
 
+// fetchConfigPath fetches the configuration file path.
 func fetchConfigPath() string {
 	var res string
 	flag.StringVar(&res, "config", "", "api_gateway/resourse/config.yml")

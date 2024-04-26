@@ -1,3 +1,4 @@
+// Package grpc provides functionality for gRPC server initialization.
 package grpc
 
 import (
@@ -8,12 +9,14 @@ import (
 	"net"
 )
 
+// Grpc represents the gRPC server.
 type Grpc struct {
 	log        *slog.Logger
 	gRPCServer *grpc.Server
 	port       int
 }
 
+// New creates a new instance of the gRPC server.
 func New(log *slog.Logger, port int, authService authgrpc.Auth) *Grpc {
 	gRPCServer := grpc.NewServer()
 	authgrpc.Register(gRPCServer, authService)
@@ -25,12 +28,14 @@ func New(log *slog.Logger, port int, authService authgrpc.Auth) *Grpc {
 	}
 }
 
+// MustRun runs the gRPC server and panics if there's an error.
 func (a *Grpc) MustRun() {
 	if err := a.Run(); err != nil {
 		panic(err)
 	}
 }
 
+// Run starts the gRPC server.
 func (a *Grpc) Run() error {
 	const op = "grpcapp.Run"
 	log := a.log.With(
@@ -52,6 +57,7 @@ func (a *Grpc) Run() error {
 	return nil
 }
 
+// Stop stops the gRPC server.
 func (a *Grpc) Stop() {
 	const op = "grpcapp.Stop"
 

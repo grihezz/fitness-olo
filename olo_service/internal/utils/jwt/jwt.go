@@ -1,3 +1,6 @@
+// Package jwt provides functionality for working with JSON Web Tokens (JWT).
+//
+// This package includes a Validator type for validating JWT tokens using a public key.
 package jwt
 
 import (

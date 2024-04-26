@@ -1,3 +1,6 @@
+// Package slogpretty provides logging utilities with pretty formatting for the slog package.
+//
+// This package includes implementations for creating pretty loggers and handlers.
 package slogpretty
 
 import (
@@ -10,17 +13,20 @@ import (
 	"github.com/fatih/color"
 )
 
+// PrettyHandlerOptions contains options for configuring the PrettyHandler.
 type PrettyHandlerOptions struct {
-	SlogOpts *slog.HandlerOptions
+	SlogOpts *slog.HandlerOptions // Slog handler options
 }
 
+// PrettyHandler represents a handler that formats log entries in a pretty way.
 type PrettyHandler struct {
-	opts PrettyHandlerOptions
-	slog.Handler
-	l     *stdLog.Logger
-	attrs []slog.Attr
+	opts         PrettyHandlerOptions // Pretty handler options
+	slog.Handler                      // Underlying slog handler
+	l            *stdLog.Logger       // Standard logger
+	attrs        []slog.Attr          // Attributes
 }
 
+// NewPrettyHandler creates a new instance of PrettyHandler with the provided options and output writer.
 func (opts PrettyHandlerOptions) NewPrettyHandler(out io.Writer) *PrettyHandler {
 	h := &PrettyHandler{
 		Handler: slog.NewJSONHandler(out, opts.SlogOpts),
@@ -30,6 +36,8 @@ func (opts PrettyHandlerOptions) NewPrettyHandler(out io.Writer) *PrettyHandler 
 	return h
 }
 
+// Handle implements the Handle method of the slog.Handler interface.
+// It formats and prints the log entry in a pretty way.
 func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	level := r.Level.String() + ":"
 
@@ -79,6 +87,8 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	return nil
 }
 
+// WithAttrs implements the WithAttrs method of the slog.Handler interface.
+// It returns a new PrettyHandler with the given attributes.
 func (h *PrettyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &PrettyHandler{
 		Handler: h.Handler,
@@ -87,6 +97,8 @@ func (h *PrettyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	}
 }
 
+// WithGroup implements the WithGroup method of the slog.Handler interface.
+// It returns a new PrettyHandler with the given group.
 func (h *PrettyHandler) WithGroup(name string) slog.Handler {
 	// TODO: implement
 	return &PrettyHandler{

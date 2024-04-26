@@ -1,3 +1,4 @@
+// Package provider provides database connection providers.
 package provider
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// MySQLProvider represents a MySQL database provider.
 type MySQLProvider struct {
 	Username string
 	Password string
@@ -17,6 +19,7 @@ type MySQLProvider struct {
 	DB *sqlx.DB
 }
 
+// NewMySQLProvider creates a new instance of MySQLProvider.
 func NewMySQLProvider(address string, port uint16, username, password, database string) (*MySQLProvider, error) {
 	provider := &MySQLProvider{
 		Username: username,
@@ -27,7 +30,6 @@ func NewMySQLProvider(address string, port uint16, username, password, database 
 	}
 
 	err := provider.init()
-
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +37,7 @@ func NewMySQLProvider(address string, port uint16, username, password, database 
 	return provider, nil
 }
 
+// init initializes the MySQLProvider.
 func (provider *MySQLProvider) init() error {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", provider.Username, provider.Password, provider.Address, provider.Port, provider.Database)
 	driver, err := sqlx.Connect("mysql", dsn)
@@ -49,6 +52,7 @@ func (provider *MySQLProvider) init() error {
 	return nil
 }
 
+// Driver returns the MySQL database driver.
 func (provider *MySQLProvider) Driver() (*sqlx.DB, error) {
 	driver := provider.DB
 	if driver == nil {

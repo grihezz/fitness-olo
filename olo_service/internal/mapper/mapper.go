@@ -1,3 +1,7 @@
+// Package mapper provides functionality for mapping data between different types.
+//
+// This package defines a generic MapFunc type, which represents a function for mapping values from type T to type U.
+// It also includes convenience methods for mapping individual values and slices of values.
 package mapper
 
 type MapFunc[T any, U any] func(T) U

@@ -1,3 +1,4 @@
+// Package storage provides storage implementations for various data entities.
 package storage
 
 import (
@@ -5,17 +6,17 @@ import (
 	"fmt"
 )
 
+// UserStorage defines methods for interacting with user data.
 type UserStorage interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserById(id int64) (*models.User, error)
 	SaveUser(email string, passhash []byte) (int64, error)
 }
 
-// region for mysql Provider
-
+// initTableUser initializes the users table in MySQL storage.
 func (s *InMysqlStorage) initTableUser() {
 	db := s.mysqlProvider.DB
-	// Создание таблицы auth_data, если она еще не существует
+	// Create the users table if it doesn't exist
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS " + TableNameUser + " (" +
 		"id BIGINT NOT NULL AUTO_INCREMENT, " +
 		"email VARCHAR(35) NOT NULL UNIQUE, " +
@@ -29,10 +30,11 @@ func (s *InMysqlStorage) initTableUser() {
 	}
 }
 
+// GetUserByEmail retrieves a user by email from MySQL storage.
 func (s *InMysqlStorage) GetUserByEmail(email string) (*models.User, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
-		s.log.Error("Error get data from database", err)
+		s.log.Error("Error getting data from database", err)
 		return nil, err
 	}
 
@@ -49,10 +51,11 @@ func (s *InMysqlStorage) GetUserByEmail(email string) (*models.User, error) {
 	return sub, err
 }
 
+// GetUserById retrieves a user by ID from MySQL storage.
 func (s *InMysqlStorage) GetUserById(id int64) (*models.User, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
-		s.log.Error("Error get data from database", err)
+		s.log.Error("Error getting data from database", err)
 		return nil, err
 	}
 
@@ -69,21 +72,20 @@ func (s *InMysqlStorage) GetUserById(id int64) (*models.User, error) {
 	return sub, err
 }
 
+// SaveUser saves a user to MySQL storage.
 func (s *InMysqlStorage) SaveUser(email string, passhash []byte) (int64, error) {
 	driver, err := s.mysqlProvider.Driver()
 	if err != nil {
-		s.log.Error("Error insert to database", err)
+		s.log.Error("Error inserting to database", err)
 	}
 	res, err := driver.NamedExec("INSERT INTO "+TableNameUser+" (`email`, `password_hash`) VALUES (:email, :password_hash)", map[string]interface{}{
 		"email":         email,
 		"password_hash": passhash,
 	})
 	if err != nil {
-		s.log.Error("Error save user", err)
+		s.log.Error("Error saving user", err)
 		return 0, err
 	}
 	id, err := res.LastInsertId()
 	return id, err
 }
-
-// endregion

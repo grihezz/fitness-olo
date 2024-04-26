@@ -28,6 +28,7 @@ type MySQLConfig struct {
 
 // endregion
 
+// MustLoad loads the configuration from the specified path.
 func MustLoad() *Config {
 	path := fetchConfigPath()
 	if path == "" {
@@ -45,6 +46,7 @@ func MustLoad() *Config {
 	return &cfg
 }
 
+// fetchConfigPath fetches the configuration file path.
 func fetchConfigPath() string {
 	var res string
 	flag.StringVar(&res, "config", "", "path to config file")

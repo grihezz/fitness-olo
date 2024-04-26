@@ -1,3 +1,7 @@
+// Package app provides the entry point for the OLO-backend API Gateway application.
+//
+// The API gateway is responsible for routing incoming requests to the appropriate services
+// and handling cross-cutting concerns such as authentication, rate limiting, and logging.
 package app
 
 import (
@@ -17,10 +21,12 @@ import (
 )
 
 type App struct {
-	config *config.Config
-	log    *slog.Logger
+	config *config.Config // It holds various configuration parameters required by the application.
+	log    *slog.Logger   // It provides logging capabilities for the application.
 }
 
+// New is the entry point for the API Gateway application.
+// It initializes the application
 func New(log *slog.Logger) (app *App, err error) {
 	app = &App{
 		config: config.MustLoad(),
@@ -29,10 +35,14 @@ func New(log *slog.Logger) (app *App, err error) {
 	return
 }
 
+// The initService function initializes a service using the provided socket information.
+// It executes a callback function with the formatted address of the service.
 func (app *App) initService(s entity.Socket, fn func(formattedAddr string)) {
 	fn(fmt.Sprintf("%s:%d", s.Host, s.Port))
 }
 
+// The Start function initializes and starts the API gateway service.
+// It sets up HTTP server configurations, registers gRPC services, and starts listening for incoming requests.
 func (app *App) Start() {
 	const op = "httpSrv.Start"
 
