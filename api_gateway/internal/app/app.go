@@ -80,7 +80,8 @@ func (app *App) Start() {
 
 	withCors := cors.New(cors.Options{
 		AllowCredentials: true,
-		MaxAge:           300,
+		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type"},
+		MaxAge:           86400,
 	}).Handler(mux)
 
 	httpAddr := app.config.HTTP.ToStr()
