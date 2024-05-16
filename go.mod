@@ -9,20 +9,14 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/rs/cors v1.10.1
+	github.com/rs/cors v1.11.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/grpc v1.63.2
 )
 
-require (
-	github.com/kr/text v0.2.0 // indirect
-	github.com/yuin/goldmark v1.4.13 // indirect
-	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/tools v0.20.0 // indirect
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.3.0 // indirect
-)
+require github.com/kr/text v0.2.0 // indirect
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect

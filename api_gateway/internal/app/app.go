@@ -79,8 +79,11 @@ func (app *App) Start() {
 	})
 
 	withCors := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"ACCEPT", "Authorization", "Content-Type"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"*"},
 		MaxAge:           86400,
 	}).Handler(mux)
 
