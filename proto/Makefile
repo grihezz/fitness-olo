@@ -1,5 +1,7 @@
 LOCAL_BIN:=$(CURDIR)/generated/bin
 
+# example for windows WSL: make -f Makefile install-deps
+
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
@@ -50,3 +52,8 @@ vendor-proto:
 			mv generated/vendor.protogen/googleapis/google/api generated/vendor.protogen/google && \
 			rm -rf generated/vendor.protogen/googleapis ;\
 		fi
+
+test-auth-service:
+	docker compose -f ../docker-compose.yml up db -d --wait
+	go test -v ../auth_service/tests/...
+	docker compose down
