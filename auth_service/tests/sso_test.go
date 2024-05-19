@@ -124,9 +124,6 @@ func (s *AuthSuite) register(requestBody *generated.RegisterRequest) {
 	defer cancel()
 
 	_, err = authClient.Register(ctx, requestBody)
-	//if !assert.Equal(s.T(), err == nil, true) {
-	//	fmt.Printf("error %v", err)
-	//}
 }
 
 func (s *AuthSuite) login(requestBody *generated.LoginRequest) string {
