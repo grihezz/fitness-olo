@@ -7,7 +7,7 @@ package main
 import (
 	"OLO-backend/olo_service/internal/app"
 	"OLO-backend/olo_service/internal/config"
-	"OLO-backend/pkg/utils/logger/handlers"
+	"OLO-backend/pkg/utils/logger"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,15 +15,9 @@ import (
 	"log/slog"
 )
 
-const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
-)
-
 func main() {
 	cfg := config.MustLoad()
-	log := setupLogger(cfg.Env)
+	log := logger.SetupLogger(cfg.Env)
 
 	application := app.New(log, cfg)
 	go application.Start()
@@ -35,32 +29,4 @@ func main() {
 
 	application.Stop()
 	log.Info("application stopped")
-}
-
-func setupLogger(env string) *slog.Logger {
-	var log *slog.Logger
-
-	switch env {
-	case envLocal:
-		log = setupPrettySlog()
-	case envDev:
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	case envProd:
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
-	}
-	return log
-}
-
-func setupPrettySlog() *slog.Logger {
-	opts := slogpretty.PrettyHandlerOptions{
-		SlogOpts: &slog.HandlerOptions{
-			Level: slog.LevelDebug,
-		},
-	}
-
-	handler := opts.NewPrettyHandler(os.Stdout)
-
-	return slog.New(handler)
 }
