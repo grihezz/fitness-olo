@@ -39,6 +39,10 @@ generated-auth-api:
  	--plugin=protoc-gen-grpc-gateway=$(CURDIR)/generated/bin/protoc-gen-grpc-gateway \
 	$(CURDIR)/auth/auth.proto
 
+#http://localhost:6060/pkg/?m=all - docs for all packages
+docs:
+	godoc -http=:6060
+
 vendor-proto:
 		@if [ ! -d generated/vendor.protogen/google ]; then \
 			git clone https://github.com/googleapis/googleapis generated/vendor.protogen/googleapis && \
