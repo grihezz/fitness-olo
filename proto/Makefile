@@ -1,5 +1,7 @@
 LOCAL_BIN:=$(CURDIR)/generated/bin
 
+# example for windows WSL: make -f Makefile install-deps
+
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
@@ -39,6 +41,10 @@ generated-auth-api:
  	--plugin=protoc-gen-grpc-gateway=$(CURDIR)/generated/bin/protoc-gen-grpc-gateway \
 	$(CURDIR)/auth/auth.proto
 
+#http://localhost:6060/pkg/?m=all - docs for all packages
+docs:
+	godoc -http=:6060
+
 vendor-proto:
 		@if [ ! -d generated/vendor.protogen/google ]; then \
 			git clone https://github.com/googleapis/googleapis generated/vendor.protogen/googleapis && \
@@ -46,3 +52,8 @@ vendor-proto:
 			mv generated/vendor.protogen/googleapis/google/api generated/vendor.protogen/google && \
 			rm -rf generated/vendor.protogen/googleapis ;\
 		fi
+
+test-auth-service:
+	docker compose -f ../docker-compose.yml up db -d --wait
+	go test -v ../auth_service/tests/...
+	docker compose down

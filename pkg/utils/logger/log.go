@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
+	EnvLocal = "local"
+	EnvDev   = "dev"
+	EnvProd  = "prod"
 )
 
 // SetupLogger sets up the logger based on the environment.
@@ -18,16 +18,16 @@ func SetupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 
 	switch env {
-	case envLocal:
+	case EnvLocal:
 		// For local environment, use pretty logging
 		// Для локальной среды использовать красивое логирование
 		log = setupPrettySlog()
-	case envDev:
+	case EnvDev:
 		// For development environment, log debug level messages
 		// Для среды разработки логировать сообщения на уровне отладки
 		log = slog.New(
 			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	case envProd:
+	case EnvProd:
 		// For production environment, log info level messages
 		// Для продакшен среды логировать сообщения на уровне информации
 		log = slog.New(

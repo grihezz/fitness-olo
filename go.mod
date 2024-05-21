@@ -10,13 +10,18 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/rs/cors v1.11.0
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81
 	google.golang.org/genproto/googleapis/api v0.0.0-20240415180920-8c6c420018be
 	google.golang.org/grpc v1.63.2
 )
 
-require github.com/kr/text v0.2.0 // indirect
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
