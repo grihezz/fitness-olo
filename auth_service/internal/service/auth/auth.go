@@ -2,6 +2,7 @@
 package auth
 
 import (
+	"OLO-backend/auth_service/internal/domain/models"
 	"OLO-backend/auth_service/internal/storage"
 	"OLO-backend/pkg/model"
 	"OLO-backend/pkg/utils/jwt"
@@ -9,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	jwtgo "github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"time"
@@ -22,21 +24,24 @@ type Auth struct {
 	log         *slog.Logger
 	userStorage storage.UserStorage
 	tokenTTL    time.Duration
-	issuer      *jwt.Issuer
+
+	issuer    *jwt.Issuer
+	validator *jwt.Validator
 }
 
 // New creates a new instance of the authentication service.
-func New(log *slog.Logger, userStorage storage.UserStorage, jwtIssuer *jwt.Issuer, tokenTTL time.Duration) *Auth {
+func New(log *slog.Logger, userStorage storage.UserStorage, jwtIssuer *jwt.Issuer, jwtValidator *jwt.Validator, tokenTTL time.Duration) *Auth {
 	return &Auth{
 		userStorage: userStorage,
 		log:         log,
 		tokenTTL:    tokenTTL,
 		issuer:      jwtIssuer,
+		validator:   jwtValidator,
 	}
 }
 
 // Login performs user login and returns a JWT token.
-func (a *Auth) Login(ctx context.Context, email string, password string, appID int) (string, error) {
+func (a *Auth) Login(email string, password string, appID int) (string, error) {
 	const op = "auth.Login"
 
 	log := a.log.With(
@@ -77,7 +82,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 }
 
 // RegisterNewUser registers a new user.
-func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (int64, error) {
+func (a *Auth) RegisterNewUser(email string, pass string) (int64, error) {
 	const op = "auth.RegisterNewUser"
 
 	log := a.log.With(
@@ -110,28 +115,55 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string) (
 	return id, nil
 }
 
-// IsAdmin checks if a user is an admin.
-func (a *Auth) IsAdmin(ctx context.Context, userId int64) (bool, error) {
-	const op = "auth.IsAdmin"
+// GetUserInfo get information user.
+func (a *Auth) GetUserInfo(ctx context.Context) (*models.User, error) {
+	const op = "auth.GetUserInfo"
+
+	token, err := a.getToken(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s : %w", op, err)
+	}
+
+	payloadUser := a.getPayloadUser(token)
 
 	log := a.log.With(
 		slog.String("op", op),
-		slog.Int64("user_id", userId))
+		slog.Int64("user_id", payloadUser.ID),
+		slog.String("email", payloadUser.Email))
 
-	log.Info("check if user is admin")
+	log.Debug("get user information")
 
-	user, err := a.userStorage.GetUserById(userId)
+	user, err := a.userStorage.GetUserById(payloadUser.ID)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			a.log.Warn("user not found", sl.Err(err))
-
-			return false, fmt.Errorf("%s : %w", op, ErrInvalidCredentials)
+			return nil, fmt.Errorf("%s : %w", op, ErrInvalidCredentials)
 		}
 		a.log.Error("failed to get user", sl.Err(err))
-		return false, fmt.Errorf("%s:%w", op, err)
+		return nil, fmt.Errorf("%s:%w", op, err)
 	}
 
-	role := user.Role
-	isAdmin := role == "ADMIN"
-	return isAdmin, nil
+	return user, nil
+}
+
+// getPayloadUser extracts user information from the JWT token.
+func (h *Auth) getPayloadUser(token *jwtgo.Token) model.TokenUser {
+	id := int64(token.Claims.(jwtgo.MapClaims)["uid"].(float64))
+	email := token.Claims.(jwtgo.MapClaims)["email"].(string)
+	role := token.Claims.(jwtgo.MapClaims)["role"].(string)
+
+	return model.TokenUser{
+		ID:    id,
+		Email: email,
+		Role:  role,
+	}
+}
+
+// getToken retrieves and validates the JWT token from the context.
+func (a *Auth) getToken(ctx context.Context) (*jwtgo.Token, error) {
+	token, err := a.validator.TokenFromContextMetadata(ctx, "Authorization")
+	if err != nil {
+		return nil, fmt.Errorf("can't get token")
+	}
+	return token, nil
 }

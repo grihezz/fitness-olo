@@ -13,4 +13,6 @@ var (
 		Password: "password",
 		AppId:    1,
 	}
+
+	userInfo = &generated.GetUserInfoRequest{}
 )

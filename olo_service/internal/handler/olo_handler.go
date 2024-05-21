@@ -10,10 +10,8 @@ import (
 	"OLO-backend/olo_service/internal/service"
 	"OLO-backend/pkg/utils/jwt"
 	"context"
-	"errors"
 	"fmt"
 	jwtgo "github.com/golang-jwt/jwt/v5"
-	"google.golang.org/grpc/metadata"
 )
 
 // ArticleToArticleResponse converts an Article entity to a generated.Article.
@@ -53,31 +51,12 @@ func NewOloHandler(service *service.OloService, validator *jwt.Validator) *OloHa
 	}
 }
 
-// tokenFromContextMetadata extracts the JWT token from the context metadata.
-func (h *OloHandler) tokenFromContextMetadata(ctx context.Context) (*jwtgo.Token, error) {
-	headers, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, errors.New("no metadata found in context")
-	}
-	tokens := headers.Get("Authorization")
-	if len(tokens) < 1 {
-		return nil, errors.New("no token found in metadata")
-	}
-	tokenString := tokens[0]
-
-	token, err := h.validator.GetToken(tokenString)
-	if err != nil {
-		return nil, fmt.Errorf("invalid token: %w", err)
-	}
-
-	return token, nil
-}
-
 // getToken retrieves and validates the JWT token from the context.
 func (h *OloHandler) getToken(ctx context.Context) (*jwtgo.Token, error) {
-	token, err := h.tokenFromContextMetadata(ctx)
+	token, err := h.validator.TokenFromContextMetadata(ctx, "Authorization")
 	if err != nil {
-		return nil, errors.Join(err, fmt.Errorf("can't get token"))
+		// todo wrap error
+		return nil, fmt.Errorf("can't get token")
 	}
 	return token, nil
 }

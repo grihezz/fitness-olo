@@ -18,9 +18,10 @@ service Auth {
     option (google.api.http).body = "*";
   }
 
-  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse) {
-    option (google.api.http).post = "/api/auth/is_admin";
-    option (google.api.http).body = "*";
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse) {
+    option (google.api.http) = {
+      get: "/api/auth/get_user_info"
+    };
   }
 
 }
@@ -44,10 +45,11 @@ message LoginResponse {
   string token = 1;
 }
 
-message IsAdminRequest {
-  int64 user_id = 1;
-}
+message GetUserInfoRequest {}
 
-message IsAdminResponse {
-  bool is_admin = 1;
+message GetUserInfoResponse {
+  int64 user_id = 1;
+  string email = 2;
+  string role = 3;
+  string date_register = 4;
 }

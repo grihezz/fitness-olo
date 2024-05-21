@@ -4,9 +4,12 @@
 package jwt
 
 import (
+	"context"
 	"crypto"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"google.golang.org/grpc/metadata"
 	"os"
 )
 
@@ -52,6 +55,26 @@ func (v *Validator) GetToken(tokenString string) (*jwt.Token, error) {
 		})
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse token string: %w", err)
+	}
+
+	return token, nil
+}
+
+// TokenFromContextMetadata extracts the JWT token from the context metadata.
+func (v *Validator) TokenFromContextMetadata(ctx context.Context, headerKey string) (*jwt.Token, error) {
+	headers, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, errors.New("no metadata found in context")
+	}
+	tokens := headers.Get(headerKey)
+	if len(tokens) < 1 {
+		return nil, errors.New("no token found in metadata")
+	}
+	tokenString := tokens[0]
+
+	token, err := v.GetToken(tokenString)
+	if err != nil {
+		return nil, fmt.Errorf("invalid token: %w", err)
 	}
 
 	return token, nil

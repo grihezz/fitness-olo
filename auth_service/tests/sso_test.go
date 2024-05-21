@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	googlegrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"log/slog"
 	"os"
 	"testing"
@@ -63,8 +64,13 @@ func (s *AuthSuite) SetupSuite() {
 		s.T().Fatalf("jwt Issuer not found key: %v", err)
 	}
 
+	validator, err := jwt.NewValidator("../../static/public.pem")
+	if err != nil {
+		s.T().Fatalf("jwt Validator not found key: %v", err)
+	}
+
 	duration, _ := time.ParseDuration(tokenTTL)
-	s.services = auth.New(s.log, s.storage, issuer, duration)
+	s.services = auth.New(s.log, s.storage, issuer, validator, duration)
 
 	s.srv = grpc.New(s.log, portSrv, s.services)
 	go s.srv.MustRun()
@@ -90,6 +96,40 @@ func (s *AuthSuite) TestTokenVerify() {
 		s.T().Fatalf("bad extract token: %v", err)
 	}
 	if !assert.Equal(s.T(), email, user.Email) {
+		s.T().FailNow()
+	}
+}
+
+func (s *AuthSuite) TestGetUserInfo() {
+	conn, err := googlegrpc.Dial(targetAddrAuth, googlegrpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		s.Fail("Failed to create GRPC request")
+		return
+	}
+	defer conn.Close()
+
+	authClient := generated.NewAuthClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	// Anything linked to this variable will transmit request headers.
+	md := metadata.New(map[string]string{"Authorization": s.accessToken})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	resp, err := authClient.GetUserInfo(ctx, userInfo)
+	if err != nil {
+		s.T().Error(err)
+		return
+	}
+
+	email, err := extractUnverifiedClaims(s.accessToken)
+	if err != nil {
+		s.T().Fatalf("bad extract token: %v", err)
+	}
+
+	s.log.Info(resp.String())
+	if !assert.Equal(s.T(), resp.Email, email) {
 		s.T().FailNow()
 	}
 }

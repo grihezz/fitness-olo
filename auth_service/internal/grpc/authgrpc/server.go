@@ -3,6 +3,7 @@ package authgrpc
 
 import (
 	"OLO-backend/auth_service/generated"
+	"OLO-backend/auth_service/internal/domain/models"
 	"context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,9 +15,9 @@ const emptyValue = 0
 
 // Auth defines methods for authentication.
 type Auth interface {
-	Login(ctx context.Context, email string, password string, appID int) (token string, err error)
-	RegisterNewUser(ctx context.Context, email string, password string) (int64, error)
-	IsAdmin(ctx context.Context, userID int64) (bool, error)
+	Login(email string, password string, appID int) (token string, err error)
+	RegisterNewUser(email string, password string) (int64, error)
+	GetUserInfo(ctx context.Context) (*models.User, error)
 }
 
 // serverAPI implements the generated.AuthServer interface.
@@ -42,7 +43,7 @@ func (s *serverAPI) Login(ctx context.Context, req *generated.LoginRequest) (*ge
 		return nil, status.Error(codes.InvalidArgument, "app id is required")
 	}
 
-	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
+	token, err := s.auth.Login(req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
@@ -59,7 +60,7 @@ func (s *serverAPI) Register(ctx context.Context, req *generated.RegisterRequest
 		return nil, err
 	}
 
-	userID, err := s.auth.RegisterNewUser(ctx, req.GetEmail(), req.GetPassword())
+	userID, err := s.auth.RegisterNewUser(req.GetEmail(), req.GetPassword())
 
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
@@ -70,19 +71,17 @@ func (s *serverAPI) Register(ctx context.Context, req *generated.RegisterRequest
 	}, nil
 }
 
-// IsAdmin checks if a user is an admin.
-func (s *serverAPI) IsAdmin(ctx context.Context, req *generated.IsAdminRequest) (*generated.IsAdminResponse, error) {
-	if err := validateIsAdmin(req); err != nil {
-		return nil, err
-	}
-
-	isAdmin, err := s.auth.IsAdmin(ctx, req.GetUserId())
-
+// GetUserInfo return information about user
+func (s *serverAPI) GetUserInfo(ctx context.Context, _ *generated.GetUserInfoRequest) (*generated.GetUserInfoResponse, error) {
+	user, err := s.auth.GetUserInfo(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &generated.IsAdminResponse{
-		IsAdmin: isAdmin,
+	return &generated.GetUserInfoResponse{
+		UserId:       user.ID,
+		Email:        user.Email,
+		Role:         user.Role,
+		DateRegister: user.DateRegister,
 	}, nil
 }
 
@@ -93,14 +92,6 @@ func validateRegister(req *generated.RegisterRequest) error {
 	}
 	if req.GetPassword() == "" {
 		return status.Error(codes.InvalidArgument, "password is required")
-	}
-	return nil
-}
-
-// validateIsAdmin validates the IsAdmin request.
-func validateIsAdmin(req *generated.IsAdminRequest) error {
-	if req.GetUserId() == emptyValue {
-		return status.Error(codes.InvalidArgument, "user_id is required")
 	}
 	return nil
 }

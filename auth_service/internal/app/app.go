@@ -42,9 +42,15 @@ func New(log *slog.Logger, cfg *config.Config) *App {
 		panic(err)
 	}
 
+	// Initialize JWT Validator
+	validator, err := jwt.NewValidator("static/public.pem")
+	if err != nil {
+		panic(err)
+	}
+
 	// Initialize authentication service
 	// Инициализация сервиса аутентификации
-	authService := auth.New(log, uStorage, issuer, cfg.TokenTTL)
+	authService := auth.New(log, uStorage, issuer, validator, cfg.TokenTTL)
 
 	// Initialize gRPC application
 	// Инициализация gRPC приложения
