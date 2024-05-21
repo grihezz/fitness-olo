@@ -7,7 +7,7 @@ import (
 	"OLO-backend/auth_service/internal/service/auth"
 	"OLO-backend/auth_service/internal/service/grpc"
 	"OLO-backend/auth_service/internal/storage"
-	"OLO-backend/auth_service/internal/utils/jwt"
+	"OLO-backend/pkg/utils/jwt"
 	"log/slog"
 )
 

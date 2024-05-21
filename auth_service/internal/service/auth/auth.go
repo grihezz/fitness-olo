@@ -3,7 +3,8 @@ package auth
 
 import (
 	"OLO-backend/auth_service/internal/storage"
-	"OLO-backend/auth_service/internal/utils/jwt"
+	"OLO-backend/pkg/model"
+	"OLO-backend/pkg/utils/jwt"
 	"OLO-backend/pkg/utils/logger/sl"
 	"context"
 	"errors"
@@ -63,7 +64,12 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 	}
 	log.Info("user logged successfully")
 
-	token, err := a.issuer.NewToken(user, a.tokenTTL)
+	token, err := a.issuer.NewToken(model.TokenUser{
+		ID:    user.ID,
+		Email: user.Email,
+		Role:  user.Role,
+	}, a.tokenTTL)
+
 	if err != nil {
 		return "", fmt.Errorf("%s:%w", op, err)
 	}

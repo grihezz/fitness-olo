@@ -11,7 +11,7 @@ import (
 	"OLO-backend/olo_service/internal/repository"
 	"OLO-backend/olo_service/internal/repository/provider"
 	"OLO-backend/olo_service/internal/service"
-	"OLO-backend/olo_service/internal/utils/jwt"
+	"OLO-backend/pkg/utils/jwt"
 	"fmt"
 	"google.golang.org/grpc"
 	"log/slog"

@@ -4,7 +4,7 @@
 package jwt
 
 import (
-	"OLO-backend/auth_service/internal/domain/models"
+	"OLO-backend/pkg/model"
 	"crypto"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
@@ -32,7 +32,7 @@ func NewIssuer(privateKeyPath string) (*Issuer, error) {
 	}, nil
 }
 
-func (i *Issuer) NewToken(user *models.User, duration time.Duration) (string, error) {
+func (i *Issuer) NewToken(user model.TokenUser, duration time.Duration) (string, error) {
 	token := jwt.New(jwt.SigningMethodEdDSA)
 
 	claims := token.Claims.(jwt.MapClaims)

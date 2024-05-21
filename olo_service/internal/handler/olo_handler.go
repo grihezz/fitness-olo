@@ -8,7 +8,7 @@ import (
 	"OLO-backend/olo_service/internal/entity"
 	"OLO-backend/olo_service/internal/mapper"
 	"OLO-backend/olo_service/internal/service"
-	"OLO-backend/olo_service/internal/utils/jwt"
+	"OLO-backend/pkg/utils/jwt"
 	"context"
 	"errors"
 	"fmt"
