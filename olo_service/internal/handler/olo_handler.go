@@ -181,3 +181,37 @@ func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.AddAr
 			req.ArticleId, user.ID),
 	}, nil
 }
+
+func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.AddArticleForUserRequest) (*generated.AddArticleForUserResponse, error) {
+	token, err := h.getToken(ctx)
+	if err != nil {
+		return nil, err
+	}
+	user := h.newEntityUseToken(token)
+	err = h.service.DeleteArticleForUser(req.ArticleId, user.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &generated.AddArticleForUserResponse{
+		Response: fmt.Sprintf(
+			"Successfully delete article (%d) for user (%d)!",
+			req.ArticleId, user.ID),
+	}, nil
+}
+
+func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.AddWidgetForUserRequest) (*generated.AddWidgetForUserResponse, error) {
+	token, err := h.getToken(ctx)
+	if err != nil {
+		return nil, err
+	}
+	user := h.newEntityUseToken(token)
+	err = h.service.DeleteWidgetForUser(req.WidgetId, user.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &generated.AddWidgetForUserResponse{
+		Response: fmt.Sprintf(
+			"Successfully delete widget (%d) for user (%d)!",
+			req.WidgetId, user.ID),
+	}, nil
+}

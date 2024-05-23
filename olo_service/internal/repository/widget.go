@@ -56,3 +56,14 @@ func (r *WidgetRepo) AddWidgetForUser(widgetId, userId int64) error {
 	})
 	return err
 }
+func (r *WidgetRepo) DeleteWidgetForUser(widgetId int64, userId int64) error {
+	driver, err := r.mysqlProvider.Driver()
+	if err != nil {
+		return err
+	}
+	_, err = driver.NamedExec("DELETE FROM `user_has_widget` WHERE `id_widget` = :id_widget AND `id_user` = :id_user", map[string]interface{}{
+		"id_widget": widgetId,
+		"id_user":   userId,
+	})
+	return err
+}

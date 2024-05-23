@@ -47,6 +47,14 @@ service OLO {
       get: "/api/olo/getUserArticles"
     };
   }
+  rpc DeleteArticleForUser (AddArticleForUserRequest) returns (AddArticleForUserResponse) {
+    option (google.api.http).post = "/api/olo/deleteArticleForUser";
+    option (google.api.http).body = "*";
+  }
+  rpc DeleteWidgetForUser (AddWidgetForUserRequest) returns (AddWidgetForUserResponse) {
+    option (google.api.http).post = "/api/olo/deleteWidgetForUser";
+    option (google.api.http).body = "*";
+  }
 }
 
 message helloUserRequest {}

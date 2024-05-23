@@ -83,3 +83,18 @@ func (s *OloService) AddArticleForUser(articleId, userId int64) error {
 	}
 	return nil
 }
+
+func (s *OloService) DeleteArticleForUser(articleId int64, userId int64) error {
+	err := s.repo.DeleteArticleForUser(articleId, userId)
+	if err != nil {
+		return fmt.Errorf("can't delete article")
+	}
+	return nil
+}
+func (s *OloService) DeleteWidgetForUser(widgetId, userId int64) error {
+	err := s.repo.DeleteWidgetForUser(widgetId, userId)
+	if err != nil {
+		return fmt.Errorf("can't add widget for user")
+	}
+	return nil
+}

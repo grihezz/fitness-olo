@@ -14,6 +14,7 @@ type Widget interface {
 	GetAllWidgets() ([]entity.Widget, error)
 	AddWidgetForUser(widgetId, userId int64) error
 	GetUserWidgets(userId int64) ([]entity.Widget, error)
+	DeleteWidgetForUser(widgetId int64, userId int64) error
 }
 
 // Article represents the interface for interacting with article data.
@@ -21,6 +22,7 @@ type Article interface {
 	AddArticleForUser(articleId, userId int64) error
 	GetAllArticles() ([]entity.Article, error)
 	GetUsersArticles(userid int64) ([]entity.Article, error)
+	DeleteArticleForUser(articleId int64, userId int64) error
 }
 
 // Repository represents a unified interface for interacting with both widget and article data.
