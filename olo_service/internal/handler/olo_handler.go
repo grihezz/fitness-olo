@@ -27,6 +27,7 @@ func WidgetToWidgetResponse(widget entity.Widget) *generated.Widget {
 	return &generated.Widget{
 		Id:          uint64(widget.ID),
 		Description: widget.Description,
+		Data:        widget.Data,
 	}
 }
 
@@ -74,7 +75,7 @@ func (h *OloHandler) newEntityUseToken(token *jwtgo.Token) entity.User {
 	}
 }
 
-func (h *OloHandler) HelloUser(ctx context.Context, req *generated.HelloUserRequest) (*generated.HelloUserResponse, error) {
+func (h *OloHandler) HelloUser(ctx context.Context, _ *generated.HelloUserRequest) (*generated.HelloUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -87,7 +88,9 @@ func (h *OloHandler) HelloUser(ctx context.Context, req *generated.HelloUserRequ
 	}, nil
 }
 
-func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
+// todo add widget and article if user has role admin
+
+func (h *OloHandler) GetAllWidgets(ctx context.Context, _ *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
 	_, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -101,7 +104,7 @@ func (h *OloHandler) GetAllWidgets(ctx context.Context, req *generated.GetWidget
 	}, nil
 }
 
-func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
+func (h *OloHandler) GetUserWidgets(ctx context.Context, _ *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -134,7 +137,7 @@ func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.Widget
 	}, nil
 }
 
-func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
+func (h *OloHandler) GetUsersArticles(ctx context.Context, _ *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -150,7 +153,7 @@ func (h *OloHandler) GetUsersArticles(ctx context.Context, req *generated.GetAll
 	}, nil
 }
 
-func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
+func (h *OloHandler) GetAllArticles(ctx context.Context, _ *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	_, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -165,7 +168,7 @@ func (h *OloHandler) GetAllArticles(ctx context.Context, req *generated.GetAllAr
 	}, nil
 }
 
-func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.AddArticleForUserRequest) (*generated.AddArticleForUserResponse, error) {
+func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.ArticleForUserRequest) (*generated.ArticleForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -175,14 +178,14 @@ func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.AddAr
 	if err != nil {
 		return nil, err
 	}
-	return &generated.AddArticleForUserResponse{
+	return &generated.ArticleForUserResponse{
 		Response: fmt.Sprintf(
 			"Successfully add article (%d) for user (%d)!",
 			req.ArticleId, user.ID),
 	}, nil
 }
 
-func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.AddArticleForUserRequest) (*generated.AddArticleForUserResponse, error) {
+func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.ArticleForUserRequest) (*generated.ArticleForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -192,7 +195,7 @@ func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.Ad
 	if err != nil {
 		return nil, err
 	}
-	return &generated.AddArticleForUserResponse{
+	return &generated.ArticleForUserResponse{
 		Response: fmt.Sprintf(
 			"Successfully delete article (%d) for user (%d)!",
 			req.ArticleId, user.ID),

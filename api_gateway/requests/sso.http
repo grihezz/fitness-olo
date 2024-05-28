@@ -1,0 +1,33 @@
+###
+# @name=Регистрация
+POST http://{{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "username@mail.ru",
+  "password": "password"
+}
+
+###
+# @name=Авторизация
+POST http://{{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "username@mail.ru",
+  "password": "password",
+  "app_id": 1
+}
+
+> {%
+   if(response.body.token) {
+       client.global.set("accessToken", response.body.token);
+   } else {
+       client.log("token can`t get from request")
+   }
+%}
+
+###
+# @name=Пользователь получает данные о себе
+GET http://{{host}}/api/auth/get_user_info
+Authorization: {{accessToken}}

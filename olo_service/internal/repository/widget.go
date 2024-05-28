@@ -19,7 +19,7 @@ func (r *WidgetRepo) GetAllWidgets() ([]entity.Widget, error) {
 }
 
 func (r *WidgetRepo) GetUserWidgets(userId int64) ([]entity.Widget, error) {
-	return r.getWidgets(fmt.Sprintf("SELECT w.id as id, w.description as `description` FROM widgets as w, user_has_widget as u WHERE w.id = u.id_widget AND u.id_user = '%d'", userId))
+	return r.getWidgets(fmt.Sprintf("SELECT w.id as id, w.description as `description`, w.data as `data` FROM widgets as w, user_has_widget as u WHERE w.id = u.id_widget AND u.id_user = '%d'", userId))
 }
 
 func (r *WidgetRepo) getWidgets(widgetQuery string) ([]entity.Widget, error) {

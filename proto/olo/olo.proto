@@ -7,7 +7,6 @@ import "google/api/annotations.proto";
 option go_package = "/olo_service/generated";
 
 service OLO {
-
   rpc helloUser(helloUserRequest) returns (helloUserResponse) {
     option (google.api.http) = {
       get: "/api/olo/sayHello"
@@ -20,15 +19,20 @@ service OLO {
     };
   }
 
+  rpc GetUserWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
+    option (google.api.http) = {
+      get: "/api/olo/getUserWidgets"
+    };
+  }
+
   rpc AddWidgetForUser (WidgetForUserRequest) returns (WidgetForUserResponse) {
     option (google.api.http).post = "/api/olo/addWidgetForUser";
     option (google.api.http).body = "*";
   }
 
-  rpc GetUserWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
-    option (google.api.http) = {
-      get: "/api/olo/getUserWidgets"
-    };
+  rpc DeleteWidgetForUser (WidgetForUserRequest) returns (WidgetForUserResponse) {
+    option (google.api.http).post = "/api/olo/deleteWidgetForUser";
+    option (google.api.http).body = "*";
   }
 
   rpc GetAllArticles (GetAllArticlesRequest) returns (GetAllArticlesResponse) {
@@ -37,24 +41,19 @@ service OLO {
     };
   }
 
-  rpc AddArticleForUser (AddArticleForUserRequest) returns (AddArticleForUserResponse) {
-    option (google.api.http).post = "/api/olo/addArticleForUser";
-    option (google.api.http).body = "*";
-  }
-
   rpc GetUsersArticles (GetAllArticlesRequest) returns (GetAllArticlesResponse) {
     option (google.api.http) = {
       get: "/api/olo/getUserArticles"
     };
   }
 
-  rpc DeleteArticleForUser (AddArticleForUserRequest) returns (AddArticleForUserResponse) {
-    option (google.api.http).post = "/api/olo/deleteArticleForUser";
+  rpc AddArticleForUser (ArticleForUserRequest) returns (ArticleForUserResponse) {
+    option (google.api.http).post = "/api/olo/addArticleForUser";
     option (google.api.http).body = "*";
   }
 
-  rpc DeleteWidgetForUser (WidgetForUserRequest) returns (WidgetForUserResponse) {
-    option (google.api.http).post = "/api/olo/deleteWidgetForUser";
+  rpc DeleteArticleForUser (ArticleForUserRequest) returns (ArticleForUserResponse) {
+    option (google.api.http).post = "/api/olo/deleteArticleForUser";
     option (google.api.http).body = "*";
   }
 }
@@ -68,6 +67,7 @@ message helloUserResponse {
 message Widget {
   uint64 id = 1;
   string description = 2;
+  string data = 3;
 }
 
 message WidgetForUserRequest {
@@ -95,10 +95,10 @@ message GetAllArticlesResponse {
   repeated Article articles = 1;
 }
 
-message AddArticleForUserRequest {
+message ArticleForUserRequest {
   int64 articleId = 1;
 }
 
-message AddArticleForUserResponse {
+message ArticleForUserResponse {
   string response = 1;
 }
