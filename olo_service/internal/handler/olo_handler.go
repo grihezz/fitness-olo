@@ -208,7 +208,7 @@ func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.Ar
 	}, nil
 }
 
-func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.DeleteWidgetRequest) (*generated.WidgetResponse, error) {
+func (h *OloHandler) DeleteWidget(ctx context.Context, req *generated.DeleteWidgetRequest) (*generated.WidgetResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
