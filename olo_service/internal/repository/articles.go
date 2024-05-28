@@ -28,6 +28,20 @@ func (r *ArticleRepo) AddArticleForUser(articleId, userId int64) error {
 	}
 	return err
 }
+func (r *ArticleRepo) DeleteArticleForUser(articleId int64, userId int64) error {
+	driver, err := r.mysqlProvider.Driver()
+	if err != nil {
+		return err
+	}
+	_, err = driver.NamedExec("DELETE FROM `user_has_articles` WHERE `id_articles` = :id_articles AND `id_user` = :id_user", map[string]interface{}{
+		"id_articles": articleId,
+		"id_user":     userId,
+	})
+	if err != nil {
+		return fmt.Errorf("error delete article for user: %w", err)
+	}
+	return err
+}
 
 func NewArticleRepo(mysqlProvider *provider.MySQLProvider) *ArticleRepo {
 	return &ArticleRepo{mysqlProvider: mysqlProvider}
