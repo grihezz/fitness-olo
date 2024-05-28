@@ -63,8 +63,9 @@ MacOS:
 * Бабоха Григорий - golang-developer /teamlead
 * Агафонов Андрей - golang-developer /dev-ops
 
-Лицензия
+## Автор
 
-Благодарности
-Матвею Емельянову и его маме
+Copyright &copy; Андрей Агафонов, 2024
+
+The MIT License (MIT)
 
