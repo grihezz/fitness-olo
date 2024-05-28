@@ -24,6 +24,7 @@ Content-Type: application/json
        client.global.set("accessToken", response.body.token);
    } else {
        client.log("token can`t get from request")
+       client.global.set("accessToken", "");
    }
 %}
 
