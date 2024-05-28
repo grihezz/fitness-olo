@@ -117,7 +117,7 @@ func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidge
 	}, nil
 }
 
-func (h *OloHandler) WidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
+func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
