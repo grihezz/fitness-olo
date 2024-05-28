@@ -13,25 +13,24 @@ service OLO {
     };
   }
 
-  rpc GetAllWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
+  rpc GetWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
     option (google.api.http) = {
-      get: "/api/olo/getAllWidgets"
+      get: "/api/olo/getWidgets"
     };
   }
 
-  rpc GetUserWidgets (GetWidgetsRequest) returns (GetWidgetsResponse) {
-    option (google.api.http) = {
-      get: "/api/olo/getUserWidgets"
-    };
-  }
-
-  rpc AddWidgetForUser (WidgetForUserRequest) returns (WidgetForUserResponse) {
-    option (google.api.http).post = "/api/olo/addWidgetForUser";
+  rpc AddWidget (AddWidgetRequest) returns (WidgetResponse) {
+    option (google.api.http).post = "/api/olo/addWidget";
     option (google.api.http).body = "*";
   }
 
-  rpc DeleteWidgetForUser (WidgetForUserRequest) returns (WidgetForUserResponse) {
-    option (google.api.http).post = "/api/olo/deleteWidgetForUser";
+  rpc UpdateWidget (Widget) returns (WidgetResponse) {
+    option (google.api.http).post = "/api/olo/updateWidget";
+    option (google.api.http).body = "*";
+  }
+
+  rpc DeleteWidget (DeleteWidgetRequest) returns (WidgetResponse) {
+    option (google.api.http).post = "/api/olo/deleteWidget";
     option (google.api.http).body = "*";
   }
 
@@ -65,16 +64,19 @@ message helloUserResponse {
 }
 
 message Widget {
-  uint64 id = 1;
-  string description = 2;
-  string data = 3;
+  int64 id = 1;
+  string data = 2;
 }
 
-message WidgetForUserRequest {
+message AddWidgetRequest {
+  string data = 1;
+}
+
+message DeleteWidgetRequest {
   int64 widgetId = 1;
 }
 
-message WidgetForUserResponse {
+message WidgetResponse {
   string response = 1;
 }
 

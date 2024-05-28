@@ -11,10 +11,10 @@ import (
 
 // Widget represents the interface for interacting with widget data.
 type Widget interface {
-	GetAllWidgets() ([]entity.Widget, error)
-	AddWidgetForUser(widgetId, userId int64) error
-	GetUserWidgets(userId int64) ([]entity.Widget, error)
-	DeleteWidgetForUser(widgetId int64, userId int64) error
+	GetWidgets(userId int64) ([]entity.Widget, error)
+	AddWidget(data string, userId int64) (int64, error)
+	UpdateWidget(data string, widgetId, userId int64) error
+	DeleteWidget(widgetId int64, userId int64) error
 }
 
 // Article represents the interface for interacting with article data.

@@ -6,28 +6,34 @@ GET http://{{host}}/api/olo/sayHello
 Authorization: {{accessToken}}
 
 ###
-# @name=Получение всех виджетов
-GET http://{{host}}/api/olo/getAllWidgets
-Authorization: {{accessToken}}
-
-###
 # @name=Получение всех виджетов, которые добавлены у пользователя
-GET http://{{host}}/api/olo/getUserWidgets
+GET http://{{host}}/api/olo/getWidgets
 Authorization: {{accessToken}}
 
 ###
 # @name=Добавить виджет пользователя
-POST http://{{host}}/api/olo/addWidgetForUser
+POST http://{{host}}/api/olo/addWidget
 Authorization: {{accessToken}}
 Content-Type: application/json
 
 {
-  "widgetId": 1
+  "data": "Тестовый виджет"
+}
+
+###
+# @name=Обновить виджет пользователя
+POST http://{{host}}/api/olo/updateWidget
+Authorization: {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "data": "Тестовый виджет"
 }
 
 ###
 # @name=Удалить виджет у пользователю
-POST http://{{host}}/api/olo/deleteWidgetForUser
+POST http://{{host}}/api/olo/deleteWidget
 Authorization: {{accessToken}}
 Content-Type: application/json
 

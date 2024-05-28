@@ -53,19 +53,19 @@ func (a *Auth) Login(email string, password string, appID int) (string, error) {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			a.log.Warn("user not found", sl.Err(err))
 
-			return "", fmt.Errorf("%s : %w", op, ErrInvalidCredentials)
+			return "", sl.Wrap(op, ErrInvalidCredentials)
 		}
 		a.log.Error("failed to get user", sl.Err(err))
-		return "", fmt.Errorf("%s:%w", op, err)
+		return "", sl.Wrap(op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
 		a.log.Info("invalid credentials", sl.Err(err))
-		return "", fmt.Errorf("%s : %w", op, ErrInvalidCredentials)
+		return "", sl.Wrap(op, ErrInvalidCredentials)
 	}
 
 	if err != nil {
-		return "", fmt.Errorf("%s:%w", op, err)
+		return "", sl.Wrap(op, err)
 	}
 	log.Info("user logged successfully")
 
@@ -76,7 +76,7 @@ func (a *Auth) Login(email string, password string, appID int) (string, error) {
 	}, a.tokenTTL)
 
 	if err != nil {
-		return "", fmt.Errorf("%s:%w", op, err)
+		return "", sl.Wrap(op, err)
 	}
 	return token, nil
 }
@@ -95,20 +95,20 @@ func (a *Auth) RegisterNewUser(email string, pass string) (int64, error) {
 
 	if err != nil {
 		log.Error("failed to generate password hash", sl.Err(err))
-		return 0, fmt.Errorf("%s:%w", op, err)
+		return 0, sl.Wrap(op, err)
 	}
 
 	user, err := a.userStorage.GetUserByEmail(email)
 	if user != nil {
 		log.Error("user already exists")
-		return 0, fmt.Errorf("%s : %w", op, storage.ErrUserExist)
+		return 0, sl.Wrap(op, storage.ErrUserExist)
 	}
 
 	id, err := a.userStorage.SaveUser(email, passHash)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExist) {
 			log.Error("user already exists", sl.Err(err))
-			return 0, fmt.Errorf("%s : %w", op, storage.ErrUserExist)
+			return 0, sl.Wrap(op, storage.ErrUserExist)
 		}
 	}
 	log.Info("user registered")
@@ -121,7 +121,7 @@ func (a *Auth) GetUserInfo(ctx context.Context) (*models.User, error) {
 
 	token, err := a.getToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("%s : %w", op, err)
+		return nil, sl.Wrap(op, err)
 	}
 
 	payloadUser := a.getPayloadUser(token)
@@ -137,10 +137,10 @@ func (a *Auth) GetUserInfo(ctx context.Context) (*models.User, error) {
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			a.log.Warn("user not found", sl.Err(err))
-			return nil, fmt.Errorf("%s : %w", op, ErrInvalidCredentials)
+			return nil, sl.Wrap(op, ErrInvalidCredentials)
 		}
 		a.log.Error("failed to get user", sl.Err(err))
-		return nil, fmt.Errorf("%s:%w", op, err)
+		return nil, sl.Wrap(op, err)
 	}
 
 	return user, nil

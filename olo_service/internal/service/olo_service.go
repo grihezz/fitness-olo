@@ -12,6 +12,7 @@ package service
 import (
 	"OLO-backend/olo_service/internal/entity"
 	"OLO-backend/olo_service/internal/repository"
+	"OLO-backend/pkg/utils/logger/sl"
 	"fmt"
 	"log/slog"
 )
@@ -30,71 +31,81 @@ func NewOloService(log *slog.Logger, repo *repository.Repository) *OloService {
 	}
 }
 
-// GetAllWidgets retrieves all widgets from the repository.
-func (s *OloService) GetAllWidgets() ([]entity.Widget, error) {
-	widgets, err := s.repo.GetAllWidgets()
+// GetWidgets retrieves widgets associated with a specific user from the repository.
+func (s *OloService) GetWidgets(userId int64) ([]entity.Widget, error) {
+	const op = "olo.GetWidgets"
+	widgets, err := s.repo.GetWidgets(userId)
 	if err != nil {
-		return nil, fmt.Errorf("can't get all widgets")
+		return nil, sl.Wrap(op, fmt.Errorf("can't get widgets"))
 	}
 	return widgets, nil
 }
 
-// GetUserWidgets retrieves widgets associated with a specific user from the repository.
-func (s *OloService) GetUserWidgets(userId int64) ([]entity.Widget, error) {
-	widgets, err := s.repo.GetUserWidgets(userId)
+// UpdateWidget adds a widget for a specific user.
+func (s *OloService) UpdateWidget(data string, widgetId, userId int64) error {
+	const op = "olo.UpdateWidget"
+	err := s.repo.UpdateWidget(data, widgetId, userId)
 	if err != nil {
-		return nil, fmt.Errorf("can't get widgets of user")
+		return sl.Wrap(op, fmt.Errorf("can't update widget"))
 	}
-	return widgets, nil
+	return nil
 }
 
-// AddWidgetForUser adds a widget for a specific user.
-func (s *OloService) AddWidgetForUser(widgetId, userId int64) error {
-	err := s.repo.AddWidgetForUser(widgetId, userId)
+// AddWidget adds a widget for a specific user.
+func (s *OloService) AddWidget(data string, userId int64) (int64, error) {
+	const op = "olo.AddWidget"
+	widgetId, err := s.repo.AddWidget(data, userId)
 	if err != nil {
-		return fmt.Errorf("can't add widget for user")
+		return 0, sl.Wrap(op, fmt.Errorf("can't add widget"))
+	}
+	return widgetId, nil
+}
+
+// DeleteWidgetForUser delete a widget for a specific user.
+func (s *OloService) DeleteWidgetForUser(widgetId, userId int64) error {
+	const op = "olo.DeleteWidgetForUser"
+	err := s.repo.DeleteWidget(widgetId, userId)
+	if err != nil {
+		return sl.Wrap(op, fmt.Errorf("can't delete widget for user"))
 	}
 	return nil
 }
 
 // GetAllArticles retrieves all articles from the repository.
 func (s *OloService) GetAllArticles() ([]entity.Article, error) {
+	const op = "olo.GetAllArticles"
 	articles, err := s.repo.GetAllArticles()
 	if err != nil {
-		return nil, fmt.Errorf("can't get all articles")
+		return nil, sl.Wrap(op, fmt.Errorf("can't get all articles"))
 	}
 	return articles, nil
 }
 
 // GetUsersArticles retrieves articles associated with a specific user from the repository.
 func (s *OloService) GetUsersArticles(userId int64) ([]entity.Article, error) {
+	const op = "olo.GetUsersArticles"
 	articles, err := s.repo.GetUsersArticles(userId)
 	if err != nil {
-		return nil, fmt.Errorf("can't get articles of user")
+		return nil, sl.Wrap(op, fmt.Errorf("can't get articles of user"))
 	}
 	return articles, nil
 }
 
 // AddArticleForUser adds an article for a specific user.
 func (s *OloService) AddArticleForUser(articleId, userId int64) error {
+	const op = "olo.AddArticleForUser"
 	err := s.repo.AddArticleForUser(articleId, userId)
 	if err != nil {
-		return fmt.Errorf("can't add article for user")
+		return sl.Wrap(op, fmt.Errorf("can't add article for user"))
 	}
 	return nil
 }
 
 func (s *OloService) DeleteArticleForUser(articleId int64, userId int64) error {
+	const op = "olo.DeleteArticleForUser"
 	err := s.repo.DeleteArticleForUser(articleId, userId)
 	if err != nil {
-		return fmt.Errorf("can't delete article")
-	}
-	return nil
-}
-func (s *OloService) DeleteWidgetForUser(widgetId, userId int64) error {
-	err := s.repo.DeleteWidgetForUser(widgetId, userId)
-	if err != nil {
-		return fmt.Errorf("can't delete widget for user")
+		return sl.Wrap(op, fmt.Errorf("can't delete article"))
 	}
 	return nil
 }

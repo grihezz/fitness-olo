@@ -7,24 +7,17 @@ CREATE TABLE IF NOT EXISTS users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS widgets (
+CREATE TABLE IF NOT EXISTS widgetsUser (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `description` VARCHAR(100) NOT NULL,
-    `data` VARCHAR(100) NOT NULL
+    `data` VARCHAR(100) NOT NULL,
+    `id_user` BIGINT NOT NULL,
+    PRIMARY KEY (id_user)
 );
 
 CREATE TABLE IF NOT EXISTS articles (
    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
    `header` VARCHAR(100) NOT NULL,
    `body` varchar(10000) NULL
-);
-
-CREATE TABLE IF NOT EXISTS user_has_widget (
-    `id_widget` INT NOT NULL,
-    `id_user` BIGINT NOT NULL,
-    FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_widget) REFERENCES widgets(id) ON DELETE CASCADE,
-    PRIMARY KEY (id_widget, id_user)
 );
 
 CREATE TABLE IF NOT EXISTS user_has_articles (
@@ -39,7 +32,3 @@ INSERT INTO articles (header, body) VALUES ('Пример заголовка 1',
 INSERT INTO articles (header, body) VALUES ('Пример заголовка 2', 'Это пример тела статьи. 2');
 INSERT INTO articles (header, body) VALUES ('Пример заголовка 3', 'Это пример тела статьи. 3');
 INSERT INTO articles (header, body) VALUES ('Пример заголовка 4', 'Это пример тела статьи. 4');
-
-INSERT INTO widgets (description, data) VALUES ('Тестовый виджет 1', '{}');
-INSERT INTO widgets (description, data) VALUES ('Тестовый виджет 2', '{}');
-INSERT INTO widgets (description, data) VALUES ('Тестовый виджет 3', '{}');

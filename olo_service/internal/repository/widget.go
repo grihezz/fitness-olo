@@ -14,12 +14,8 @@ func NewWidgetRepo(mysqlProvider *provider.MySQLProvider) *WidgetRepo {
 	return &WidgetRepo{mysqlProvider: mysqlProvider}
 }
 
-func (r *WidgetRepo) GetAllWidgets() ([]entity.Widget, error) {
-	return r.getWidgets(`SELECT * FROM widgets`)
-}
-
-func (r *WidgetRepo) GetUserWidgets(userId int64) ([]entity.Widget, error) {
-	return r.getWidgets(fmt.Sprintf("SELECT w.id as id, w.description as `description`, w.data as `data` FROM widgets as w, user_has_widget as u WHERE w.id = u.id_widget AND u.id_user = '%d'", userId))
+func (r *WidgetRepo) GetWidgets(userId int64) ([]entity.Widget, error) {
+	return r.getWidgets(fmt.Sprintf("SELECT * FROM widgetsUser WHERE id_user = '%d'", userId))
 }
 
 func (r *WidgetRepo) getWidgets(widgetQuery string) ([]entity.Widget, error) {
@@ -45,23 +41,42 @@ func (r *WidgetRepo) getWidgets(widgetQuery string) ([]entity.Widget, error) {
 	return widgets, nil
 }
 
-func (r *WidgetRepo) AddWidgetForUser(widgetId, userId int64) error {
+func (r *WidgetRepo) UpdateWidget(data string, widgetId, userId int64) error {
 	driver, err := r.mysqlProvider.Driver()
 	if err != nil {
 		return err
 	}
-	_, err = driver.NamedExec("INSERT INTO `user_has_widget` (`id_widget`, `id_user`) VALUES (:id_widget, :id_user)", map[string]interface{}{
+
+	_, err = driver.NamedExec("UPDATE `widgetsUser` SET `data`=:data WHERE `id`=:id_widget AND `id_user`=:id_user", map[string]interface{}{
+		"data":      data,
 		"id_widget": widgetId,
 		"id_user":   userId,
 	})
 	return err
 }
-func (r *WidgetRepo) DeleteWidgetForUser(widgetId int64, userId int64) error {
+
+func (r *WidgetRepo) AddWidget(data string, userId int64) (int64, error) {
+	driver, err := r.mysqlProvider.Driver()
+	if err != nil {
+		return 0, err
+	}
+	res, err := driver.NamedExec("INSERT INTO `widgetsUser` (`data`, `id_user`) VALUES (:data, :id_user)", map[string]interface{}{
+		"data":    data,
+		"id_user": userId,
+	})
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	return id, err
+}
+
+func (r *WidgetRepo) DeleteWidget(widgetId int64, userId int64) error {
 	driver, err := r.mysqlProvider.Driver()
 	if err != nil {
 		return err
 	}
-	_, err = driver.NamedExec("DELETE FROM `user_has_widget` WHERE `id_widget` = :id_widget AND `id_user` = :id_user", map[string]interface{}{
+	_, err = driver.NamedExec("DELETE FROM `widgetsUser` WHERE `id` = :id_widget AND `id_user` = :id_user", map[string]interface{}{
 		"id_widget": widgetId,
 		"id_user":   userId,
 	})

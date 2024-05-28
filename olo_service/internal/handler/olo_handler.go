@@ -12,6 +12,8 @@ import (
 	"context"
 	"fmt"
 	jwtgo "github.com/golang-jwt/jwt/v5"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ArticleToArticleResponse converts an Article entity to a generated.Article.
@@ -25,9 +27,8 @@ func ArticleToArticleResponse(article entity.Article) *generated.Article {
 // WidgetToWidgetResponse converts a Widget entity to a generated.Widget.
 func WidgetToWidgetResponse(widget entity.Widget) *generated.Widget {
 	return &generated.Widget{
-		Id:          uint64(widget.ID),
-		Description: widget.Description,
-		Data:        widget.Data,
+		Id:   widget.ID,
+		Data: widget.Data,
 	}
 }
 
@@ -78,7 +79,7 @@ func (h *OloHandler) newEntityUseToken(token *jwtgo.Token) entity.User {
 func (h *OloHandler) HelloUser(ctx context.Context, _ *generated.HelloUserRequest) (*generated.HelloUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
 	return &generated.HelloUserResponse{
@@ -88,31 +89,15 @@ func (h *OloHandler) HelloUser(ctx context.Context, _ *generated.HelloUserReques
 	}, nil
 }
 
-// todo add widget and article if user has role admin
-
-func (h *OloHandler) GetAllWidgets(ctx context.Context, _ *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
-	_, err := h.getToken(ctx)
-	if err != nil {
-		return nil, err
-	}
-	widgets, err := h.service.GetAllWidgets()
-	if err != nil {
-		return nil, err
-	}
-	return &generated.GetWidgetsResponse{
-		Widgets: h.mapperWidget.MapEach(widgets),
-	}, nil
-}
-
-func (h *OloHandler) GetUserWidgets(ctx context.Context, _ *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
+func (h *OloHandler) GetWidgets(ctx context.Context, _ *generated.GetWidgetsRequest) (*generated.GetWidgetsResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
-	widgets, err := h.service.GetUserWidgets(user.ID)
+	widgets, err := h.service.GetWidgets(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &generated.GetWidgetsResponse{
@@ -120,32 +105,53 @@ func (h *OloHandler) GetUserWidgets(ctx context.Context, _ *generated.GetWidgets
 	}, nil
 }
 
-func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
+func (h *OloHandler) UpdateWidget(ctx context.Context, req *generated.Widget) (*generated.WidgetResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
+
 	user := h.newEntityUseToken(token)
-	err = h.service.AddWidgetForUser(req.WidgetId, user.ID)
+
+	err = h.service.UpdateWidget(req.Data, req.Id, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &generated.WidgetForUserResponse{
+	return &generated.WidgetResponse{
+		Response: fmt.Sprintf(
+			"Successfully update widget (%d) for user (%d)!",
+			req.Id, user.ID),
+	}, nil
+}
+
+func (h *OloHandler) AddWidget(ctx context.Context, req *generated.AddWidgetRequest) (*generated.WidgetResponse, error) {
+	token, err := h.getToken(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	user := h.newEntityUseToken(token)
+
+	widgetId, err := h.service.AddWidget(req.Data, user.ID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &generated.WidgetResponse{
 		Response: fmt.Sprintf(
 			"Successfully add widget (%d) for user (%d)!",
-			req.WidgetId, user.ID),
+			widgetId, user.ID),
 	}, nil
 }
 
 func (h *OloHandler) GetUsersArticles(ctx context.Context, _ *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
 	articles, err := h.service.GetUsersArticles(user.ID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &generated.GetAllArticlesResponse{
@@ -156,11 +162,11 @@ func (h *OloHandler) GetUsersArticles(ctx context.Context, _ *generated.GetAllAr
 func (h *OloHandler) GetAllArticles(ctx context.Context, _ *generated.GetAllArticlesRequest) (*generated.GetAllArticlesResponse, error) {
 	_, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	articles, err := h.service.GetAllArticles()
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &generated.GetAllArticlesResponse{
@@ -171,12 +177,12 @@ func (h *OloHandler) GetAllArticles(ctx context.Context, _ *generated.GetAllArti
 func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.ArticleForUserRequest) (*generated.ArticleForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
 	err = h.service.AddArticleForUser(req.ArticleId, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &generated.ArticleForUserResponse{
 		Response: fmt.Sprintf(
@@ -188,12 +194,12 @@ func (h *OloHandler) AddArticleForUser(ctx context.Context, req *generated.Artic
 func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.ArticleForUserRequest) (*generated.ArticleForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
 	err = h.service.DeleteArticleForUser(req.ArticleId, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &generated.ArticleForUserResponse{
 		Response: fmt.Sprintf(
@@ -202,17 +208,17 @@ func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.Ar
 	}, nil
 }
 
-func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
+func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.DeleteWidgetRequest) (*generated.WidgetResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
 	err = h.service.DeleteWidgetForUser(req.WidgetId, user.ID)
 	if err != nil {
 		return nil, err
 	}
-	return &generated.WidgetForUserResponse{
+	return &generated.WidgetResponse{
 		Response: fmt.Sprintf(
 			"Successfully delete widget (%d) for user (%d)!",
 			req.WidgetId, user.ID),
