@@ -15,7 +15,7 @@ func NewWidgetRepo(mysqlProvider *provider.MySQLProvider) *WidgetRepo {
 }
 
 func (r *WidgetRepo) GetWidgets(userId int64) ([]entity.Widget, error) {
-	return r.getWidgets(fmt.Sprintf("SELECT * FROM widgetsUser WHERE id_user = '%d'", userId))
+	return r.getWidgets(fmt.Sprintf("SELECT id, data FROM widgetsUser WHERE id_user = %d", userId))
 }
 
 func (r *WidgetRepo) getWidgets(widgetQuery string) ([]entity.Widget, error) {
