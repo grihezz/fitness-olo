@@ -117,7 +117,7 @@ func (h *OloHandler) GetUserWidgets(ctx context.Context, req *generated.GetWidge
 	}, nil
 }
 
-func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWidgetForUserRequest) (*generated.AddWidgetForUserResponse, error) {
+func (h *OloHandler) WidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (h *OloHandler) AddWidgetForUser(ctx context.Context, req *generated.AddWid
 	if err != nil {
 		return nil, err
 	}
-	return &generated.AddWidgetForUserResponse{
+	return &generated.WidgetForUserResponse{
 		Response: fmt.Sprintf(
 			"Successfully add widget (%d) for user (%d)!",
 			req.WidgetId, user.ID),
@@ -199,7 +199,7 @@ func (h *OloHandler) DeleteArticleForUser(ctx context.Context, req *generated.Ad
 	}, nil
 }
 
-func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.AddWidgetForUserRequest) (*generated.AddWidgetForUserResponse, error) {
+func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.WidgetForUserRequest) (*generated.WidgetForUserResponse, error) {
 	token, err := h.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ func (h *OloHandler) DeleteWidgetForUser(ctx context.Context, req *generated.Add
 	if err != nil {
 		return nil, err
 	}
-	return &generated.AddWidgetForUserResponse{
+	return &generated.WidgetForUserResponse{
 		Response: fmt.Sprintf(
 			"Successfully delete widget (%d) for user (%d)!",
 			req.WidgetId, user.ID),
