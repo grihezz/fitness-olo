@@ -8,10 +8,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS widgetsUser (
-    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `id` INT NOT NULL AUTO_INCREMENT,
     `data` VARCHAR(100) NOT NULL,
     `id_user` BIGINT NOT NULL,
-    PRIMARY KEY (id_user)
+    PRIMARY KEY (`id`, `id_user`)
 );
 
 CREATE TABLE IF NOT EXISTS articles (
