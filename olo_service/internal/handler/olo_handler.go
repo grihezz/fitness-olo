@@ -214,6 +214,8 @@ func (h *OloHandler) DeleteWidget(ctx context.Context, req *generated.DeleteWidg
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	user := h.newEntityUseToken(token)
+
+	// todo validate params and throw error if data not right
 	err = h.service.DeleteWidgetForUser(req.WidgetId, user.ID)
 	if err != nil {
 		return nil, err

@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS widgetsUser (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `data` VARCHAR(100) NOT NULL,
+    `data` TEXT NOT NULL,
     `id_user` BIGINT NOT NULL,
     PRIMARY KEY (`id`, `id_user`)
 );
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS widgetsUser (
 CREATE TABLE IF NOT EXISTS articles (
    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
    `header` VARCHAR(100) NOT NULL,
-   `body` varchar(10000) NULL
+   `body` TEXT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_has_articles (
